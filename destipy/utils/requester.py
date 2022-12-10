@@ -161,7 +161,8 @@ class Requester:
                         if 300 > response.status >= 200:
                             return await response.json()
 
-                        if response.status in {500, 502, 503, 504} and retries < self.max_retries:
+                        # Error code 503 is for maintenance, so can be skipped as it still returns a response with ErrorCode=5
+                        if response.status in {500, 502, 504} and retries < self.max_retries:
                             sleep_time = float(random.random() + 0.93) / 2
                             self.logger.warning("Got %s status code. Sleeping for %.2f seconds. Remaining retries: %i",
                                                 response.status, sleep_time, self.max_retries - retries)
