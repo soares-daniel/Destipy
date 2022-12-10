@@ -14,6 +14,9 @@ setuptools.setup(
     long_description=long_description,
     url="https://github.com/soares-daniel/Destipy/",
     packages=setuptools.find_packages(),
+    install_requires=[
+        "aiohttp>=3.6.2",
+    ],
     classifiers = [
         'Development Status :: 3 - Alpha',
         "Intended Audience :: Developers",
