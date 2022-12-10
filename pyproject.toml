@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "Destipy"
 version = "0.0.2"
 authors = [
-  { name="Sedam", email="sedam.code@gmil.com" },
+  { name="Sedam", email="sedam.code@gmail.com" },
 ]
 keywords = ["bungie", "destiny", "async", "wrapper", "api"]
 description = "Asynchronous Python Wrapper for the Bungie API"
