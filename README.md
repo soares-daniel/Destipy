@@ -41,6 +41,8 @@ pip install Destipy
 In you project you can use it as a simple client without authentication by initialize a client with your Api Key like this:
 
 ```
+from destipy.destiny_client import DestinyClient
+
 client = DestinyClient(<API_KEY>)
 user = await userEndpoints.GetBungieNetUserById(<MEMBERSHIP_ID>)
 ```
@@ -48,6 +50,8 @@ user = await userEndpoints.GetBungieNetUserById(<MEMBERSHIP_ID>)
 If you plan on using a specific category of endpoints multiple times you can also use the endpoint category itself as a class:
 
 ```
+from destipy.destiny_client import DestinyClient
+
 client = DestinyClient(<API_KEY>)
 user_endpoints = client.user
 user = await user_endpoints.GetBungieNetUserById(<MEMBERSHIP_ID>)
