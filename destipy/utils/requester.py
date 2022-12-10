@@ -13,7 +13,7 @@ from typing import Optional
 
 import aiohttp
 
-from error import (DestipyException, DestipyRunTimeError, HTTPError,
+from destipy.utils.error import (DestipyException, DestipyRunTimeError, HTTPError,
                     RateLimitedError)
 
 

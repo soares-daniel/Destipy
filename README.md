@@ -2,7 +2,7 @@
 
 This is a asynchronous Python Wrapper around the Bungie API. It allows one to send requests to all given endpoints of the Bungie API seen in their [Bungie.Net API Documentation](https://bungie-net.github.io/multi/index.html).
 
-NOTE: 
+NOTE:
 
 * This is my first real project which was meant for a Discord Bot for my own Server but then decided to release, which means that bugs are likely.
 * Some of the code is inspired or taken from [pydest](https://github.com/jgayfer/pydest/tree/master/pydest) and [aiobungie](https://github.com/nxtlo/aiobungie) so check them out!
@@ -27,6 +27,10 @@ Here are a few examples:
 * [COMING SOON](https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley)
 
 ## Usage
+
+### Requirements
+
+- aiohttp
 
 Install `Destipy`:
 
