@@ -35,7 +35,7 @@ Here are a few examples:
 Install `Destipy`:
 
 ```
-$ pip install destipy
+$ pip install Destipy==0.0.1
 ```
 
 In you project you can use it as a simple client without authentication by initialize a client with your Api Key like this:

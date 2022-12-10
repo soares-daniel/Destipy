@@ -1,2 +1,7 @@
+#Env
 /.venv
 /.vscode
+
+#PyPi
+dist
+Destipy.egg-info
