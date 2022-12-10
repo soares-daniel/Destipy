@@ -158,7 +158,7 @@ class Requester:
                         if response.status == http.HTTPStatus.NO_CONTENT:
                             return {}
 
-                        if 300 > response.status >= 200:
+                        if 300 > response.status >= 200 or response.status == 503: # 503 = maintenance
                             return await response.json()
 
                         # Error code 503 is for maintenance, so can be skipped as it still returns a response with ErrorCode=5
