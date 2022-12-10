@@ -30,12 +30,12 @@ Here are a few examples:
 
 ### Requirements
 
-- aiohttp
+* aiohttp
 
 Install `Destipy`:
 
 ```
-$ pip install Destipy
+pip install Destipy
 ```
 
 In you project you can use it as a simple client without authentication by initialize a client with your Api Key like this:
