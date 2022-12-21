@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -17,7 +18,7 @@ class Base:
         try:
             self.logger.info("Getting available locales...")
             url = self.BASE_URL + "GetAvailableLocales/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -30,7 +31,7 @@ class Base:
         try:
             self.logger.info("Getting common settings...")
             url = self.BASE_URL + "Settings/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -45,7 +46,7 @@ class Base:
         try:
             self.logger.info("Getting user system overrides...")
             url = self.BASE_URL + "UserSystemOverrides/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -64,6 +65,6 @@ class Base:
             self.logger.info("Getting global alerts...")
             url = self.BASE_URL + "GlobalAlerts/?includestreaming={}"
             url = url.format(param_dict[include_streaming])
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)

@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -20,7 +21,7 @@ class Tokens:
         try:
             self.logger.info("Forcing drops repair...")
             url = self.TOKENS_URL + "Partner/ForceDropsRepair/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -50,7 +51,7 @@ class Tokens:
                 "TransactionId": transaction_id
             }
             url = self.TOKENS_URL + "Partner/ClaimOffer/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -75,7 +76,7 @@ class Tokens:
             self.logger.info("Applying missing partner offer...")
             url = self.TOKENS_URL + "Partner/ApplyMissingOffers/{}/{}/"
             url = url.format(partner_application_id, target_bnet_membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -100,7 +101,7 @@ class Tokens:
             self.logger.info("Getting partner offer skul history...")
             url = self.TOKENS_URL + "Partner/History/{}/{}/"
             url = url.format(partner_application_id, target_bnet_membership_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -124,7 +125,7 @@ class Tokens:
             self.logger.info("Getting partner reward history...")
             url = self.TOKENS_URL + "Partner/History/{}/Application/{}/"
             url = url.format(target_bnet_membership_id, partner_application_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -142,7 +143,7 @@ class Tokens:
         try:
             self.logger.info("Getting bungie rewards for user {}...".format(membership_id))
             url = self.TOKENS_URL + "Rewards/GetRewardsForUser/{}/".format(membership_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -166,7 +167,7 @@ class Tokens:
             self.logger.info("Getting bungie rewards for platform user...")
             url = self.TOKENS_URL + "Rewards/GetRewardsForPlatformUser/{}/{}/"
             url = url.format(membership_id, membership_type)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -179,6 +180,6 @@ class Tokens:
         try:
             self.logger.info("Getting current bungie rewards list...")
             url = self.TOKENS_URL + "Rewards/GetBungieRewardsList/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)

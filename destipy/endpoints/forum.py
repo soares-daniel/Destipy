@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -38,7 +39,7 @@ class Forum:
             self.logger.info("Getting topics from forum...")
             url = self.FORUM_URL + "GetTopicsPages/{}/{}/{}/{}/{}/{}/?locales={}&tagstring={}"
             url = url.format(page, page_size, group, sort, quick_date, category_filter, locales, tag_string)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -66,7 +67,7 @@ class Forum:
             self.logger.info("Getting core topics from forum...")
             url = self.FORUM_URL + "GetCoreTopicsPaged/{}/{}/{}/{}/?locales={}"
             url = url.format(page, sort, quick_date, category_filter, locales)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -101,7 +102,7 @@ class Forum:
             self.logger.info("Getting thread of post...")
             url = self.FORUM_URL + "GetPostsThreadedPaged/{}/{}/{}/{}/{}/{}/{}/?showbanned={}"
             url = url.format(parent_post_id, page, page_size, reply_size, get_parent_post, root_thread_mode, sort_mode, show_banned)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -133,7 +134,7 @@ class Forum:
             self.logger.info("Getting thread of post...")
             url = self.FORUM_URL + "GetPostsThreadedPagedFromChild/{}/{}/{}/{}/{}/{}/?showbanned={}"
             url = url.format(child_post_id, page, page_size, reply_size, root_thread_mode, sort_mode, show_banned)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -152,7 +153,7 @@ class Forum:
             self.logger.info("Getting post and parent...")
             url = self.FORUM_URL + "GetPostAndParent/{}/?showbanned={}"
             url = url.format(child_post_id, show_banned)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -174,7 +175,7 @@ class Forum:
             self.logger.info("Getting post and parent awaiting approval...")
             url = self.FORUM_URL + "GetPostAndParentAwaitingApproval/{}/?showbanned={}"
             url = url.format(child_post_id, show_banned)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -190,7 +191,7 @@ class Forum:
         try:
             self.logger.info("Getting topic for content...")
             url = self.FORUM_URL + "GetTopicForContent/{}".format(content_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -206,7 +207,7 @@ class Forum:
         try:
             self.logger.info("Getting forum tag suggestion...")
             url = self.FORUM_URL + "GetForumTagSuggestions/?partialtag={}".format(partial_tag)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -222,7 +223,7 @@ class Forum:
         try:
             self.logger.info("Getting poll from topic {}...".format(topic_id))
             url = self.FORUM_URL + "Poll/{}/".format(topic_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -241,6 +242,6 @@ class Forum:
                 "body": body
             }
             url = self.FORUM_URL + "Recruit/Summaries/"
-            return await self.requester.request(method="POST", url=url, data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload)
         except Exception as ex:
             self.logger.exception(ex)

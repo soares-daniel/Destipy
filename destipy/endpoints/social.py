@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 class Social:
@@ -19,7 +20,7 @@ class Social:
         try:
             self.logger.info("Getting friend list for {}...".format(token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/"
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -35,7 +36,7 @@ class Social:
         try:
             self.logger.info("Getting friend request list for {}...".format(token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/Requests/"
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -53,7 +54,7 @@ class Social:
         try:
             self.logger.info("Issuing friend request to {} for {}...".format(membership_id, token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/Add/{}/".format(membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -71,7 +72,7 @@ class Social:
         try:
             self.logger.info("Accepting friend request from {} for {}...".format(membership_id, token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/Requests/Accept/{}/".format(membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -89,7 +90,7 @@ class Social:
         try:
             self.logger.info("Decline friend request from {} for {}...".format(membership_id, token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/Add/{}/".format(membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -107,7 +108,7 @@ class Social:
         try:
             self.logger.info("Removing friend {} for {}...".format(membership_id, token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/Remove/{}/".format(membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -124,7 +125,7 @@ class Social:
         try:
             self.logger.info("Removing friend request from {} for {}...".format(membership_id, token["membership_id"]))
             url = self.SOCIAL_URL + "Friends/Requests/Remove/{}/".format(membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -141,6 +142,6 @@ class Social:
         try:
             self.logger.info("Getting platform friend list for {}...".format(friend_platform))
             url = self.SOCIAL_URL + "PlatformFriends/{}/{}/".format(friend_platform, page)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)

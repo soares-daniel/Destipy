@@ -1,92 +1,59 @@
-"""This module contains the Requester class, which handles all the requests to the Bungie API.
-
-NOTE: Most of the code is taken from:
-    https://github.com/nxtlo/aiobungie/blob/master/aiobungie/rest.py
-"""
-
 import asyncio
 import base64
 import http
-import random
+import logging
 import time
 from typing import Optional
 
 import aiohttp
+from destipy.utils.error import DestipyRunTimeError, DestipyHTTPError
 
-from destipy.utils.error import (DestipyException, DestipyRunTimeError, HTTPError,
-                    RateLimitedError)
+from destipy.utils.http_method import HTTPMethod
 
 
 class Requester:
-    """
-    This class handles all the requests to the Bungie API.
-    """
-    def __init__(self, api_key, max_retries, max_rate_limit_retries, logger):
-        self.logger = logger
+    """This class handles all the requests to the Bungie API."""
+    def __init__(
+        self,
+        api_key: str,
+        max_ratelimit_retries: int,
+        logger: logging.Logger,
+    ) -> None:
         self.api_key = api_key
-        self.max_retries = max_retries
-        self.max_rate_limit_retries = max_rate_limit_retries
+        self.logger = logger
+        self.max_ratelimit_retries = max_ratelimit_retries
 
-    async def handle_ratelimit(self,
+    async def handle_ratelimit(
+        self,
         response: aiohttp.ClientResponse,
         method: str,
-        route: str,
-        max_ratelimit_retries: int = 3,
+        url: str,
+        **kwargs
     ) -> None:
-        """Handles the ratelimiting for the client.
+        """Handles the ratelimiting for the client."""
 
-        Args:
-            response (aiohttp.ClientResponse): The response to handle.
-            method (str): The method of the request.
-            route (str): The route of the request.
-            max_ratelimit_retries (int, optional):
-            The max retries number if requests hit a `429` status code. Defaults to 3.
-
-        Raises:
-        HTTPError: If too many requests are made.
-            DestipyRunTimeError: If max rate limit retries are reached.
-            RateLimitedError: If we are being rate limited.
-        """
-        if response.status != http.HTTPStatus.TOO_MANY_REQUESTS:
-            return
-
+        if response.status != http.HTTPStatus.TOO_MANY_REQUESTS: # Too many requests
+            retries = 0
+            while response.status == http.HTTPStatus.TOO_MANY_REQUESTS:
+                if retries < self.max_ratelimit_retries:
+                    raise DestipyRunTimeError("Max rate limit retries reached.")
+                # Get the time to wait from the response headers
+                ratelimit_reset = int(response.headers["x-rateLimit-reset"])
+                # Wait for the ratelimit to reset
+                asyncio.sleep(ratelimit_reset)
+                # Send the request again
+                response = await self.request(method, url, **kwargs)
+                retries+=1
         if response.content_type != "application/json":
-            raise HTTPError(
-                f"Being ratelimited on non JSON request, {response.content_type}.",
-                http.HTTPStatus.TOO_MANY_REQUESTS,
+            raise DestipyHTTPError(
+                f"Wrong content type: {response.content_type}. You may being rate limited.",
+                response.status,
             )
-
-        count: int = 0
-        json = await response.json()
-        retry_after = float(json["ThrottleSeconds"])
-
-        while True:
-            if count == max_ratelimit_retries:
-                raise DestipyRunTimeError()
-
-            if retry_after <= 0:
-                # We sleep for a little bit to avoid funky behavior.
-                sleep_time = float(random.random() + 0.93) / 2
-
-                self.logger.warning(
-                    "We're being ratelimited with method %s route %s. Sleeping for %.2fs.",
-                    method,
-                    route,
-                    sleep_time,
-                )
-                count += 1
-                await asyncio.sleep(sleep_time)
-                continue
-
-            raise RateLimitedError(
-                body=json,
-                url=str(response.real_url),
-                retry_after=retry_after,
-            )
+        return response
 
     async def request(
         self,
-        method: str,
+        method: HTTPMethod,
         url: str,
         access_token: Optional[str] = None,
         data: Optional[dict] = None,
@@ -94,83 +61,41 @@ class Requester:
         refresh: Optional[bool] = False,
         client_id: Optional[str] = None,
         client_secret: Optional[str] = None,
-    ) -> dict:
-        """Makes a request to the Bungie API.
+        **kwargs
+    ) -> str:
+        """Makes a request to the Bungie API."""
+        # Set the headers for the generic request
+        headers = {
+            "X-API-Key": self.api_key,
+            "Content-Type": "application/json"
+        }
+        # Set the headers for token request
+        if oauth:
+            encoded = base64.b64encode(f"{client_id}:{client_secret}"
+                                       .encode("utf-8")).decode("utf-8")
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
+            headers["Authorization"] = f"Basic {encoded}"
+        # Set header for token refreshing
+        if refresh:
+            headers["Content-Type"] = "application/x-www-form-urlencoded"
+        # Set the authorization header if the access token is provided
+        if access_token is not None:
+            headers["Authorization"] = f"Bearer {access_token}"
 
-        Args:
-            method (str): The method of the request.
-            url (str): The url of the request.
-            access_token (str, optional): The access token to use for the request. Defaults to None.
-            data (str, optional): The data to send with post requests. Defaults to None.
-            oauth (bool, optional): Whether or not the request is an oauth request
-            (Only for token fetching). Defaults to False.
-            refresh (bool, optional): Whether or not the request is a refresh request
-            (Only for token refreshing). Defaults to False.
-            client_id (str, optional): The client id of your application (Only for oauth needed).
-            Defaults to None.
-            client_secret (str, optional): The client secret of your application
-            (Only for oauth needed). Defaults to None.
-        Raises:
-            DestipyException: If the request fails.
+        # Set the request body if it is provided
+        if data is not None:
+            kwargs["json"] = data
 
-        Returns:
-            dict: The response from the Bungie API.
+        async with aiohttp.ClientSession() as session:
+            taken_time = time.monotonic()
+            # Make the request using the ClientSession.request method
+            async with session.request(method.value, url, headers=headers, **kwargs) as response:
+                response_time = time.monotonic() - taken_time
+                self.logger.debug(f"{method.value} {url} -> {response.status} {response.reason} ({response_time:.2f}s)")
+                response = await self.handle_ratelimit(response, method, url, **kwargs)
 
-        """
-        retries: int = 0
-        while True:
-            try:
-                if oauth:
-                    encoded = base64.b64encode(f'{client_id}:{client_secret}'
-                                         .encode('utf-8')).decode('utf-8')
-                    headers = {
-                        "Content-Type": "application/x-www-form-urlencoded",
-                        "X-API-Key": self.api_key,
-                        "Authorization": f"Basic {encoded}",
-                    }
-                elif refresh:
-                    headers = {
-                        "X-API-Key": self.api_key,
-                        "Content-Type": "application/x-www-form-urlencoded",
-                    }
-                elif access_token:
-                    headers = {
-                        "X-API-Key": self.api_key,
-                        "Authorization": "Bearer {}".format(access_token)
-                    }
-                else:
-                    headers = {"X-API-Key": self.api_key}
-
-                async with aiohttp.ClientSession() as session:
-                    taken_time = time.monotonic()
-                    async with session.request(
-                        method=method,
-                        url=url,
-                        headers=headers,
-                        data=data,
-                        ) as response:
-                        response_time = (time.monotonic() - taken_time)
-                        self.logger.debug(f"GET {url} -> {response.status} {response.reason}. Taken time: {response_time}")
-
-                        await self.handle_ratelimit(response, method, url,
-                                                    self.max_rate_limit_retries)
-
-                        if response.status == http.HTTPStatus.NO_CONTENT:
-                            return {}
-
-                        if 300 > response.status >= 200 or response.status == 503: # 503 = maintenance
-                            return await response.json()
-
-                        # Error code 503 is for maintenance, so can be skipped as it still returns a response with ErrorCode=5
-                        if response.status in {500, 502, 504} and retries < self.max_retries:
-                            sleep_time = float(random.random() + 0.93) / 2
-                            self.logger.warning("Got %s status code. Sleeping for %.2f seconds. Remaining retries: %i",
-                                                response.status, sleep_time, self.max_retries - retries)
-                            retries += 1
-                            await asyncio.sleep(sleep_time)
-                            continue
-
-                        raise DestipyException(str(response))
-
-            except DestipyRunTimeError:
-                continue
+                if response.status == http.HTTPStatus.NO_CONTENT:
+                    return {}
+                # Return the response as a json. Provide the user the ability to handle the status code
+                return await response.json()
+             

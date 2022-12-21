@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -20,7 +21,7 @@ class User:
         try:
             self.logger.info(f"Getting bungie.net user by id for {membership_id}...")
             url = self.USER_URL + "GetBungieNetUserById/{}/".format(membership_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -37,7 +38,7 @@ class User:
         try:
             self.logger.info(f"Getting sanitized platform display names for {membership_id}...")
             url = self.USER_URL + "GetSanitizedPlatformDisplayNames/{}/".format(membership_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -54,7 +55,7 @@ class User:
         try:
             self.logger.info("Getting credential types for target account for {membership_id}...")
             url = self.USER_URL + "GetCredentialTypesForTargetAccount/{}/".format(membership_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -67,7 +68,7 @@ class User:
         try:
             self.logger.info("Getting available themes...")
             url = self.USER_URL + "GetAvailableThemes/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -87,7 +88,7 @@ class User:
             self.logger.info(f"Getting membership data by id for {membership_id}...")
             url = self.USER_URL + "GetMembershipsById/{}/{}/"
             url = url.format(membership_id,membership_type)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -104,7 +105,7 @@ class User:
         try:
             self.logger.info(f"Getting membership data for current user for {token['membership_id']}...")
             url = self.USER_URL + "GetMembershipsForCurrentUser/"
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -129,7 +130,7 @@ class User:
             self.logger.info(f"Getting membership from hard linked credential {credential}...")
             url = self.USER_URL + "GetMembershipFromHardLinkedCredential/{}/{}/"
             url = url.format(credential_type, credential)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -147,7 +148,7 @@ class User:
             self.logger.info("Searching by global name post...")
             payload = {"display_name_prefix": display_name_prefix}
             url = self.USER_URL + "Search/GlobalName/{}/".format(page)
-            return await self.requester.request(method="POST", url=url, data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
             

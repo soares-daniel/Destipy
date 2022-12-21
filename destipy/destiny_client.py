@@ -1,6 +1,8 @@
 import logging
 import logging.handlers
 
+import aiohttp
+
 from .endpoints.app import App
 from .endpoints.base import Base
 from .endpoints.community_content import CommunityContent
@@ -47,14 +49,14 @@ class DestinyClient():
         logger (optional): The logger to use. If none is given, a default logger with a TimedRotatingFileHandler wih backupCount of 7 is used.
     """
     def __init__(
-            self, api_key: str,
-            client_id: str = "",
-            client_secret: str = "",
-            redirect_uri: str = "",
-            max_retries: int = 3,
-            max_ratelimit_retries: int = 3,
-            log_file: str = "logs/destiny.log",
-            logger = None):
+        self, api_key: str,
+        client_id: str = "",
+        client_secret: str = "",
+        redirect_uri: str = "",
+        max_ratelimit_retries: int = 3,
+        log_file: str = "logs/destipy.log",
+        logger = None,
+    ) -> None:
 
         default_logger = logging.getLogger(__name__)
         default_logger.setLevel(logging.DEBUG)
@@ -69,7 +71,7 @@ class DestinyClient():
             default_logger.handlers.clear()
         default_logger.addHandler(file_handler)
         self.logger = default_logger if logger is None else logger
-        requester = Requester(api_key, max_retries, max_ratelimit_retries, self.logger)
+        requester = Requester(api_key, max_ratelimit_retries, self.logger)
         self.app: App = App(client_id, requester, self.logger)
         self.base: Base = Base(requester, self.logger)
         self.community_content: CommunityContent = CommunityContent(requester, self.logger)

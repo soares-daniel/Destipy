@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -22,7 +23,7 @@ class Fireteam:
         try:
             self.logger.info("Getting active non-public fireteam count for {} for clan {}...".format(token["membership_id"], group_id))
             url = self.FIRETEAM_URL + "Clan/{}/ActiveCount/".format(group_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -56,7 +57,7 @@ class Fireteam:
         try:
             self.logger.info("Getting available clan fireteams for clan {}...".format(group_id))
             url = self.FIRETEAM_URL + "Clan/{}/Available/{}/{}/{}/{}/{}/{}/?lang_filter={}".format(group_id, platform, activity_type, date_range, slot_filter, public_only, page, lang_filter)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -92,7 +93,7 @@ class Fireteam:
             self.logger.info("Getting available clan fireteams...")
             url = self.FIRETEAM_URL + "Search/Available/{}/{}/{}/{}/?lang_filter={}"
             url = url.format(platform, activity_type, date_range, slot_filter, page, lang_filter)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -125,7 +126,7 @@ class Fireteam:
             self.logger.info("Getting own clan fireteams for {} for clan {}...".format(token["membership_id"], group_id))
             url = self.FIRETEAM_URL + "Clan/{}/My/{}/{}/{}/?lang_filter={}&group_filter={}"
             url = url.format(group_id, platform, include_closed, page, lang_filter, bool_dict[group_filter])
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -148,6 +149,6 @@ class Fireteam:
         try:
             self.logger.info("Getting fireteam {} for clan {}...".format(fireteam_id, group_id))
             url = self.FIRETEAM_URL + "Clan/{}/Summary/{}/".format(group_id, fireteam_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)

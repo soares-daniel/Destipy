@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -41,7 +42,7 @@ class App:
             self.logger.info("Fetching application api usage...")
             url = self.APP_URL + "ApplicationApiUsage/{}/{}"
             url = url.format(application_id, query)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -57,6 +58,6 @@ class App:
         try:
             self.logger.info("Getting bungie applications...")
             url = self.APP_URL + "FirstPlay/"
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)

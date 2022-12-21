@@ -9,14 +9,14 @@ NOTE:
 
 ISSUES:
 
-* Most of the POST requests are not working but already available to choose, so don't be surprised if they return nothing.
-* I will also overwork the design but just wanted to get something done and release it already :).
+* Some of the Endpoints POST endpoints may not work properly. I just reworked the request-design but need to implement tests to verify that everything works!
 
 ## Features
 
 * Every endpoint in the documentation is implemented, POST and GET.
 * Download and Extraction of the manifest to a .content file.
 * Download and Extraction of the manifest to a MongoDB database (COMING SOON).
+* Logging with own logger or with the default logger by adding a file "logs/Destipy.log" ('logs' being a folder) in the root folder.
 
 ## Examples
 
@@ -25,8 +25,6 @@ Here are a few examples:
 * [COMING SOON](https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley)
 * [COMING SOON](https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley)
 * [COMING SOON](https://www.youtube.com/watch?v=dQw4w9WgXcQ&ab_channel=RickAstley)
-
-## Usage
 
 ### Requirements
 
@@ -44,7 +42,7 @@ In you project you can use it as a simple client without authentication by initi
 from destipy.destiny_client import DestinyClient
 
 client = DestinyClient(<API_KEY>)
-user = await userEndpoints.GetBungieNetUserById(<MEMBERSHIP_ID>)
+user = await client.user.GetBungieNetUserById(<MEMBERSHIP_ID>)
 ```
 
 If you plan on using a specific category of endpoints multiple times you can also use the endpoint category itself as a class:

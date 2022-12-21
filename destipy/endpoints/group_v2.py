@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -17,7 +18,7 @@ class GroupV2:
         try:
             self.logger("Getting available avatars...")
             url = self.GROUPV2_URL + "GetAvailableAvatars/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -30,7 +31,7 @@ class GroupV2:
         try:
             self.logger("Getting available avatars...")
             url = self.GROUPV2_URL + "GetAvailableThemes/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -47,7 +48,7 @@ class GroupV2:
         try:
             self.logger.info("Getting user clan invite setting...")
             url = self.GROUPV2_URL + "GetUserClanInviteSetting/{}/".format(m_type)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -65,7 +66,7 @@ class GroupV2:
             self.logger.info("Getting recommended groups...")
             url = self.GROUPV2_URL + "GetRecommendedGroups/{}/{}/"
             url = url.format(group_type, created_date_range)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -122,7 +123,7 @@ class GroupV2:
             payload.pop("localeFilter")
             payload.pop("tagText")
         url = self.GROUPV2_URL + "Search/"
-        return await self.requester.request(method="POST", url=url, data=payload)
+        return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload)
 
     async def GetGroup(self, group_id: int) -> dict:
         """Get information about a specific group of the given ID.
@@ -136,7 +137,7 @@ class GroupV2:
         try:
             self.logger.info("Getting group...")
             url = self.GROUPV2_URL + "{}/".format(group_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -153,7 +154,7 @@ class GroupV2:
         try:
             self.logger.info("Getting group by name...")
             url = self.GROUPV2_URL + "Name/{}/{}/".format(group_name, group_type)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -174,7 +175,7 @@ class GroupV2:
                 "groupType": group_type,
             }
             url = self.GROUPV2_URL + "NameV2/"
-            return await self.requester.request(method="POST", url=url, data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -190,7 +191,7 @@ class GroupV2:
         try:
             self.logger.info("Getting optional conversations...")
             url = self.GROUPV2_URL + "{}/OptionalConversations/".format(group_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -262,7 +263,7 @@ class GroupV2:
                 "defaultPublicity": defaultPublicity,
             }
             url = self.GROUPV2_URL + "{}/Edit".format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -308,7 +309,7 @@ class GroupV2:
                 "gonfalonDetailColorId": gonfalon_detail_color_id,
             }
             url = self.GROUPV2_URL + "{}/EditClanBanner".format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -367,7 +368,7 @@ class GroupV2:
                 "joinLevel": join_level,
             }
             url = self.GROUPV2_URL + "{}/EditFounderOptions".format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -397,7 +398,7 @@ class GroupV2:
                 "chatSecurity": chat_security,
             }
             url = self.GROUPV2_URL + "{}/OptionalConversations/Add/".format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -432,7 +433,7 @@ class GroupV2:
                 "chatSecurity": chat_security,
             }
             url = self.GROUPV2_URL + "{}/OptionalConversations/Edit/{}".format(group_id, conversation_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -462,7 +463,7 @@ class GroupV2:
             self.logger.info("Getting members of group...")
             url = self.GROUPV2_URL + "{}/Members/?memberType={}&nameSearch={}"
             url = url.format(group_id, member_type, name_search)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -480,7 +481,7 @@ class GroupV2:
             self.logger.info("Getting admins and founder of group...")
             url = self.GROUPV2_URL + "{}/AdminsAndFounder/?currentPage={}"
             url = url.format(group_id, current_page)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -513,7 +514,7 @@ class GroupV2:
             self.logger.info("Editing group membership...")
             url = self.GROUPV2_URL + "{}/Members/{}/{}/SetMembershipType/{}"
             url = url.format(group_id, membership_type, membership_id, member_type)
-            return await self.requester.request(method="POST", url=url, data={}, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -541,7 +542,7 @@ class GroupV2:
             self.logger.info("Kicking member...")
             url = self.GROUPV2_URL + "{}/Members/{}/{}/Kick/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method="POST", url=url, data={}, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -577,7 +578,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/{}/{}/Ban/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -604,7 +605,7 @@ class GroupV2:
             self.logger.info("Unbanning member...")
             url = self.GROUPV2_URL + "{}/Members/{}/{}/Unban/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method="POST", url=url, data={}, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -624,7 +625,7 @@ class GroupV2:
             self.logger.info("Getting banned members...")
             url = self.GROUPV2_URL + "{}/Banned/?currentPage={}"
             url = url.format(group_id, current_page)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -649,7 +650,7 @@ class GroupV2:
             self.logger.info("Transferring founder...")
             url = self.GROUPV2_URL + "{}/Admin/AbdicateFoundership/{}/{}"
             url = url.format(group_id, membership_type, founder_id_new)
-            return await self.requester.request(method="POST", url=url)
+            return await self.requester.request(method=HTTPMethod.POST, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -669,7 +670,7 @@ class GroupV2:
             self.logger.info("Getting pending members...")
             url = self.GROUPV2_URL + "{}/Members/Pending/?currentPage={}"
             url = url.format(group_id, current_page)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -688,7 +689,7 @@ class GroupV2:
             self.logger.info("Getting invited members...")
             url = self.GROUPV2_URL + "{}/Members/InvitedIndividuals/?currentPage={}"
             url = url.format(group_id, current_page)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -710,7 +711,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/ApproveAll/"
             url = url.format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -732,7 +733,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/DenyAll/"
             url = url.format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -764,7 +765,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/ApproveList/"
             url = url.format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -795,7 +796,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/Approve/{}/{}/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -825,7 +826,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/DenyList/"
             url = url.format(group_id)
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -853,7 +854,7 @@ class GroupV2:
         try:
             url = self.GROUPV2_URL + "User/{}/{}/{}/{}".format(membership_type, destiny_membership_id, filter, group)
             self.logger.info("Getting groups for {}...".format(destiny_membership_id))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -878,7 +879,7 @@ class GroupV2:
         try:
             self.logger.info("Recovering group for {}...".format(membership_id))
             url = self.GROUPV2_URL + "Recover/{}/{}/{}/".format(membership_type, membership_id, group_type)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -905,7 +906,7 @@ class GroupV2:
         try:
             self.logger.info("Getting potential groups for {}...".format(membership_id))
             url = self.GROUPV2_URL + "User/Potential/{}/{}/{}/{}/".format(membership_type, membership_id, filter, group_type)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -938,7 +939,7 @@ class GroupV2:
             payload = {
                     "message": message
             }
-            return await self.requester.request(method="POST", url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -965,6 +966,6 @@ class GroupV2:
             self.logger.info("Cancelling invite for {} to group {}...".format(membership_id, group_id))
             url = self.GROUPV2_URL + "{}/Members/IndividualInviteCancel/{}/{}/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)

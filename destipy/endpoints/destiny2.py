@@ -1,5 +1,6 @@
 from datetime import datetime
 
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -19,7 +20,7 @@ class Destiny2:
         try:
             self.logger.info("Getting Destiny Manifest...")
             url = self.DESTINY2_URL + "Manifest/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -50,7 +51,7 @@ class Destiny2:
             self.logger.info("Getting Destiny Entity async definition for hash {}...".format(hash_identifier))
             url = self.DESTINY2_URL + "Manifest/{}/{}/"
             url = url.format(entity_type, hash_identifier)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -83,7 +84,7 @@ class Destiny2:
             }
             url = self.DESTINY2_URL + "SearchDestinyPlayerByBungieName/{}/"
             url = url.format(membership_type)
-            return await self.requester.request(method="POST", url=url, data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -116,7 +117,7 @@ class Destiny2:
             self.logger.info("Getting linked profiles for member {}...".format(membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/LinkedProfiles/?get_all_memberships={}"
             url = url.format(membership_type, membership_id, params_dict[get_all_memberships])
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -144,7 +145,7 @@ class Destiny2:
             self.logger.info("Getting profile components information for member {}...".format(destiny_membership_id))
             url = url = self.DESTINY2_URL + '{}/Profile/{}/?components={}'
             url = url.format(membership_type, destiny_membership_id, ','.join([str(i) for i in components]))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -176,7 +177,7 @@ class Destiny2:
             self.logger.info("Getting character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/?components={}"
             url = url.format(membership_type, destiny_membership_id, character_id, ','.join([str(i) for i in components]))
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -193,7 +194,7 @@ class Destiny2:
         try:
             self.logger.info("Getting clan weekly reward state of clan {}...".format(group_id))
             url = self.DESTINY2_URL + "Clan/{}/WeeklyRewardState/".format(group_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -206,7 +207,7 @@ class Destiny2:
         try:
             self.logger.info("Getting clan banner source...")
             url = self.DESTINY2_URL + "Clan/GetAvailableBanners/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -236,7 +237,7 @@ class Destiny2:
             self.logger.info("Getting item details of instance {} for account {}...".format(itemInstanceId, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/Item/{}/?components={}"
             url = url.format(membership_type, destiny_membership_id, itemInstanceId, ','.join([str(i) for i in components]))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -274,7 +275,7 @@ class Destiny2:
             self.logger.info("Getting vendor details for character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/Vendors/?components={}&filter={}"
             url = url.format(membership_type, destiny_membership_id, character_id, ','.join([str(i) for i in components]), filter)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -308,7 +309,7 @@ class Destiny2:
             self.logger.info("Getting vendor details of vendor_hash {}...".format(vendor_hash))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/Vendors/{}/?components={}"
             url = url.format(membership_type, destiny_membership_id, character_id, vendor_hash, ','.join([str(i) for i in components]))
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -365,7 +366,7 @@ class Destiny2:
             self.logger.info("Getting collectible node details {} for character {} of account {}...".format(collectible_presentation_node_hash, character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/Collectibles/{}/?components={}"
             url = url.format(membership_type, destiny_membership_id, character_id, collectible_presentation_node_hash, ','.join([str(i) for i in components]))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -406,7 +407,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/TransferItem/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -446,7 +447,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/PullFromPostmaster/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -477,7 +478,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/EquipItem/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -509,7 +510,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/EquipItems/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -543,7 +544,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/SetLockState/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -577,7 +578,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/SetTrackedState/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -634,7 +635,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/InsertSocketPlug/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -685,7 +686,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/InsertSocketPlugFree/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -701,7 +702,7 @@ class Destiny2:
         try:
             self.logger.info("Getting post game carnage report for activity {}...".format(activity_id))
             url = self.DESTINY2_URL + "Stats/PostGameCarnageReport/{}/".format(activity_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -742,7 +743,7 @@ class Destiny2:
             }
             url = self.DESTINY2_URL + "Stats/PostGameCarnageReport/{}/Report/"
             url = url.format(activity_id)
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -755,7 +756,7 @@ class Destiny2:
         try:
             self.logger.info("Getting historical stats definition...")
             url = self.DESTINY2_URL + "Stats/Definition/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -786,7 +787,7 @@ class Destiny2:
             self.logger.info("Getting clan leaderboards for clan {}...".format(group_id))
             url = self.DESTINY2_URL + "Stats/Leaderboards/Clans/{}/?maxtop={}&modes={}&statid={}"
             url = url.format(group_id, max_top, ','.join(modes), stat_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -808,7 +809,7 @@ class Destiny2:
             self.logger.info("Getting clan aggregate stats for clan {}...".format(group_id))
             url = self.DESTINY2_URL + "Stats/AggregateClanStats/{}/?modes={}"
             url = url.format(group_id, ','.join([str(i) for i in modes]))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -843,7 +844,7 @@ class Destiny2:
             self.logger.info("Getting leaderboards for account {}...".format(destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Account/{}/Stats/Leaderboards/?maxtop={}&modes={}&statid={}"
             url = url.format(membership_type, destiny_membership_id, max_top, ','.join([str(i) for i in modes]), stat_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -879,7 +880,7 @@ class Destiny2:
         try:
             self.logger.info("Getting leaderboards for character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "Stats/Leaderboards/{}/{}/{}/?maxtop={}&modes={}&statid={}".format(membership_type, destiny_membership_id, character_id, max_top, ','.join(modes), stat_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -900,7 +901,7 @@ class Destiny2:
             self.logger.info("Searching destiny entities for searchterm {}...".format(search_term))
             url = self.DESTINY2_URL + "Armory/Search/Destiny2/{}/{}/?page={}"
             url = url.format(type, search_term, page)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -944,7 +945,7 @@ class Destiny2:
             self.logger.info("Getting historical stats for character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Account/{}/Character/{}/Stats/?modes={}&dayend={}&daystart={}&period_type={}&groups={}"
             url = url.format(membership_type, destiny_membership_id, character_id, ','.join([str(i) for i in modes]), day_end, day_start, period_type, ','.join([str(i) for i in groups]))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -972,7 +973,7 @@ class Destiny2:
             self.logger.info("Getting historical stats for account {}...".format(destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Account/{}/Stats/?{}"
             url = url.format(membership_type, destiny_membership_id, ','.join([str(i) for i in groups]))
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1032,7 +1033,7 @@ class Destiny2:
             self.logger.info("Getting unique weapon history for character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Account/{}/Character/{}/Stats/UniqueWeapons/"
             url = url.format(membership_type, destiny_membership_id, character_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1058,7 +1059,7 @@ class Destiny2:
             self.logger.info("Getting aggregate activity stats for character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Account/{}/Character/{}/Stats/AggregateActivityStats/"
             url = url.format(membership_type, destiny_membership_id, character_id)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1074,7 +1075,7 @@ class Destiny2:
         try:
             self.logger.info("Getting public milestone content for milestone {}...".format(milestoneHash))
             url = self.DESTINY2_URL + "Milestones/{}/Content/".format(milestoneHash)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1087,7 +1088,7 @@ class Destiny2:
         try:
             self.logger.info("Getting public milestones...")
             url = self.DESTINY2_URL + "Milestones/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1122,7 +1123,7 @@ class Destiny2:
                 "characterId": character_id
             }
             url = self.DESTINY2_URL + "Awa/Initialize/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1153,7 +1154,7 @@ class Destiny2:
                 "nonce": nonce
             }
             url = self.DESTINY2_URL + "Awa/AwaProvideAuthorizationResult/"
-            return await self.requester.request(method="POST", url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1170,6 +1171,6 @@ class Destiny2:
         try:
             self.logger.info("Getting action token...")
             url = self.DESTINY2_URL + "Awa/GetActionToken/{}".format(correlation_id)
-            return await self.requester.request(method="GET", url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
         except Exception as ex:
             self.logger.exception(ex)

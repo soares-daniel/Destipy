@@ -15,7 +15,7 @@ class DestipyException(Exception):
         return f'{self.message}'
 
 
-class HTTPError(DestipyException):
+class DestipyHTTPError(DestipyException):
     """HTTP Error
 
     Args:
@@ -23,8 +23,10 @@ class HTTPError(DestipyException):
         http_status (http.HTTPStatus): The HTTP status code.
     """
     def __init__(self, message: str, http_status: http.HTTPStatus):
-        super().__init__(message)
+        self.message = message
         self.http_status = http_status
+        message = f'{message} (HTTP status code: {http_status})'
+        super().__init__(message)
 
 
 class RateLimitedError(Exception):

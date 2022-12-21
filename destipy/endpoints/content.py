@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -21,7 +22,7 @@ class Content:
         try:
             self.logger.info(f"Getting content type for {content_type}...")
             url = self.CONTENT_URL + "GetContentType/{}/".format(content_type)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -40,7 +41,7 @@ class Content:
             self.logger.info(f"Getting content by id {content_id}...")
             url = self.CONTENT_URL + "GetContentById/{}/{}/?head={}"
             url = url.format(content_id, locale, self.head_params[head])
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -66,7 +67,7 @@ class Content:
             self.logger.info(f"Getting content by tag {tag} and type {content_type}...")
             url = self.CONTENT_URL + "GetContentByTagAndType/{}/{}/{}/?head={}"
             url = url.format(tag, content_type, locale, self.head_params[head])
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -99,7 +100,7 @@ class Content:
             query_params = "?head={}&search_text={}&&ctype={}&current_page={}&source={}&tag={}".format(self.head_params[head], search_text, c_type, current_page, source, tag)
             url = self.CONTENT_URL + "SearchContentWithText/{}/{}"
             url = url.format(locale, query_params)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -131,7 +132,7 @@ class Content:
             query_params.format(self.head_params[head], current_page, items_per_page)
             url = self.CONTENT_URL + "SearchContentByTagAndType/{}/{}/{}/{}"
             url = url.format(tag, content_type, locale, query_params)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -148,7 +149,7 @@ class Content:
         try:
             self.logger.info(f"Searching for help articles with text {search_text}...")
             url = self.CONTENT_URL + "SearchHelpArticles/{}/{}/".format(search_text, size)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -164,6 +165,6 @@ class Content:
         try:
             self.logger.info(f"Getting RSS news article for {page_token}...")
             url = self.CONTENT_URL + "Rss/NewsArticle/{}/".format(page_token)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)

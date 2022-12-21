@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -24,6 +25,6 @@ class CommunityContent:
             self.logger.info("Getting community content...")
             url = self.BASE_URL + "CommunityContent/Get/{}/{}/{}"
             url = url.format(media_filter, page, sort)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)

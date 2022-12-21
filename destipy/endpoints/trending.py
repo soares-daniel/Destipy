@@ -1,3 +1,4 @@
+from destipy.utils.http_method import HTTPMethod
 from destipy.utils.requester import Requester
 
 
@@ -18,7 +19,7 @@ class Trending:
         try:
             self.logger.info("Getting trending categories...")
             url = self.TRENDING_URL + "Categories/"
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -35,7 +36,7 @@ class Trending:
         try:
             self.logger.info("Getting trending category {}...".format(category_id))
             url = self.TRENDING_URL + "Category/{}/{}/".format(category_id, page_number)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -54,6 +55,6 @@ class Trending:
         try:
             self.logger.info("Getting trending entry detail for {} of type {}...".format(identifier, trending_entry_type))
             url = self.TRENDING_URL + "Details/{}/{}/".format(trending_entry_type, identifier)
-            return await self.requester.request(method="GET", url=url)
+            return await self.requester.request(method=HTTPMethod.GET, url=url)
         except Exception as ex:
             self.logger.exception(ex)
