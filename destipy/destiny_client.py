@@ -1,8 +1,6 @@
 import logging
 import logging.handlers
 
-import aiohttp
-
 from .endpoints.app import App
 from .endpoints.base import Base
 from .endpoints.community_content import CommunityContent
