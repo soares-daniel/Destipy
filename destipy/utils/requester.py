@@ -84,14 +84,20 @@ class Requester:
 
         # Set the request body if it is provided
         if data is not None:
-            kwargs["json"] = data
+            if refresh or oauth:
+                kwargs["data"] = data
+            else:
+                kwargs["json"] = data
 
         async with aiohttp.ClientSession() as session:
             taken_time = time.monotonic()
             # Make the request using the ClientSession.request method
             async with session.request(method.value, url, headers=headers, **kwargs) as response:
                 response_time = time.monotonic() - taken_time
-                self.logger.debug(f"{method.value} {url} -> {response.status} {response.reason} ({response_time:.2f}s)")
+                if response.status != http.HTTPStatus.OK:
+                    self.logger.warning(f"{method.value} {url} -> {response.status} {response.reason} ({response_time:.2f}s)")
+                else:
+                    self.logger.debug(f"{method.value} {url} -> {response.status} {response.reason} ({response_time:.2f}s)")
                 response = await self.handle_ratelimit(response, method, url, **kwargs)
 
                 if response.status == http.HTTPStatus.NO_CONTENT:
