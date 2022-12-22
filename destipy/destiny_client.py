@@ -43,7 +43,7 @@ class DestinyClient():
         redirect_uri (str, optional): The redirect URI to use for OAuth authentication. Defaults to "".
         max_retries (int, optional): The maximum number of retries to make when a request fails. Defaults to 3.
         max_ratelimit_retries (int, optional): The maximum number of retries to make when a request fails due to rate limiting. Defaults to 3.
-        log_file (str, optional): The file to log to. Defaults to "logs/destiny.log".
+        log_file (str, optional): The file to log to. Defaults to "logs/destipy.log".
         logger (optional): The logger to use. If none is given, a default logger with a TimedRotatingFileHandler wih backupCount of 7 is used.
     """
     def __init__(
