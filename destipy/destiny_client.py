@@ -56,9 +56,9 @@ class DestinyClient():
         logger = None,
     ) -> None:
 
-        default_logger = logging.getLogger(__name__)
+        default_logger = logging.getLogger("Destipy")
         default_logger.setLevel(logging.DEBUG)
-        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        formatter = logging.Formatter(fmt="%(asctime)s - %(levelname)-8s - %(name)s - %(message)s", datefmt="%H:%M:%S")
         file_handler = logging.handlers.TimedRotatingFileHandler(
             filename= log_file,
             when="midnight",
