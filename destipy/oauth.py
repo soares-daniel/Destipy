@@ -1,6 +1,7 @@
 import uuid
 from urllib.parse import parse_qs, urlparse
 
+from .utils.http_method import HTTPMethod
 from .utils.requester import Requester
 
 
@@ -54,7 +55,7 @@ class OAuth:
         try:
             if query_dict["state"][0] == self.last_state:
                 self.logger.debug("State is valid, fetching token...")
-                return await self.requester.request("POST", url, data=payload,
+                return await self.requester.request(HTTPMethod.POST, url, data=payload,
                                                     oauth=True, client_id=self.client_id,
                                                     client_secret=self.client_secret)
         except Exception as ex:
@@ -82,7 +83,7 @@ class OAuth:
         try:
             membership_id = token["membership_id"]
             self.logger.info(f"Refreshing token for {membership_id}...")
-            return await self.requester.request("POST", self.TOKEN_URL, data=data, refresh=True)
+            return await self.requester.request(HTTPMethod.POST, self.TOKEN_URL, data=data, refresh=True)
         except Exception as ex:
             self.logger.exception(f"Error refreshing token. Reason: {ex}")
         
