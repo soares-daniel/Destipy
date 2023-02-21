@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import logging.handlers
 
@@ -47,7 +48,6 @@ class DestinyClient():
         max_ratelimit_retries (int, optional): The maximum number of retries to make when a request fails due to rate limiting. Defaults to 3.
         log_file (str, optional): The file to log to. Defaults to "logs/destipy.log".
         logger (optional): The logger to use. If none is given, a default logger with a TimedRotatingFileHandler wih backupCount of 7 is used.
-        session (aiohttp.ClientSession, optional): The session to use for requests. If none is given, a new session is created. Defaults to None.
     """
     def __init__(
         self, api_key: str,
@@ -57,7 +57,7 @@ class DestinyClient():
         max_ratelimit_retries: int = 3,
         log_file: str = "logs/destipy.log",
         logger = None,
-        session: aiohttp.ClientSession = None
+        loop = None
     ) -> None:
 
         default_logger = logging.getLogger("Destipy")
@@ -73,10 +73,9 @@ class DestinyClient():
             default_logger.handlers.clear()
         default_logger.addHandler(file_handler)
         self.logger = default_logger if logger is None else logger
-        
-        if session is None:
-            session = aiohttp.ClientSession()
-        requester = Requester(api_key, max_ratelimit_retries, self.logger, session)
+        self._loop = asyncio.get_event_loop() if loop is None else loop
+        self._session = aiohttp.ClientSession(loop=self._loop)
+        requester = Requester(api_key, max_ratelimit_retries, self.logger, self._session)
         self.app: App = App(client_id, requester, self.logger)
         self.base: Base = Base(requester, self.logger)
         self.community_content: CommunityContent = CommunityContent(requester, self.logger)
@@ -85,7 +84,7 @@ class DestinyClient():
         self.fireteam: Fireteam = Fireteam(requester, self.logger)
         self.forum: Forum = Forum(requester, self.logger)
         self.group_v2: GroupV2 = GroupV2(requester, self.logger)
-        self.manifest: Manifest = Manifest(self.destiny2, session)
+        self.manifest: Manifest = Manifest(self.destiny2, self._session)
         self.oauth: OAuth = OAuth(client_id, client_secret, requester, redirect_uri, self.logger)
         self.social: Social = Social(requester, self.logger)
         self.tokens: Tokens = Tokens(requester, self.logger)
