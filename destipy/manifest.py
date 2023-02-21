@@ -25,10 +25,10 @@ class Manifest:
     It also contains methods to decode hash ids into json objects but this should not be used directly.
     Instead, use the decode_hash method form the DestinyClient class.
     """
-    def __init__(self, destiny2):
+    def __init__(self, destiny2, session: aiohttp.ClientSession):
         self.manifest_files = {'en': '', 'fr': '', 'es': '', 'de': '', 'it': '', 'ja': '', 'pt-br': '', 'es-mx': '',
                                'ru': '', 'pl': '', 'zh-cht': '', 'ko': '', 'zh-chs': ''}
-        self.session = aiohttp.ClientSession()
+        self.session = session
         self.destiny2 = destiny2
 
     async def decode_hash(self, hash_id: int, definition: str, language: str):

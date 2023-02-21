@@ -18,11 +18,12 @@ class Requester:
         api_key: str,
         max_ratelimit_retries: int,
         logger: logging.Logger,
+        session: aiohttp.ClientSession,
     ) -> None:
         self.api_key = api_key
         self.logger = logger
         self.max_ratelimit_retries = max_ratelimit_retries
-
+        self.session = session
     async def handle_ratelimit(
         self,
         response: aiohttp.ClientResponse,
@@ -89,10 +90,10 @@ class Requester:
             else:
                 kwargs["json"] = data
 
-        async with aiohttp.ClientSession() as session:
+        async with self.session:
             taken_time = time.monotonic()
             # Make the request using the ClientSession.request method
-            async with session.request(method.value, url, headers=headers, **kwargs) as response:
+            async with self.session.request(method.value, url, headers=headers, **kwargs) as response:
                 response_time = time.monotonic() - taken_time
                 if response.status != http.HTTPStatus.OK:
                     self.logger.warning(f"{method.value} {url} -> {response.status} {response.reason} ({response_time:.2f}s)")
