@@ -47,6 +47,7 @@ class DestinyClient():
         max_ratelimit_retries (int, optional): The maximum number of retries to make when a request fails due to rate limiting. Defaults to 3.
         log_file (str, optional): The file to log to. Defaults to "logs/destipy.log".
         logger (optional): The logger to use. If none is given, a default logger with a TimedRotatingFileHandler wih backupCount of 7 is used.
+        session (aiohttp.ClientSession, optional): The session to use for requests. If none is given, a new session is created. Defaults to None.
     """
     def __init__(
         self, api_key: str,
