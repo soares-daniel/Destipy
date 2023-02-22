@@ -1,8 +1,6 @@
 import logging
 import logging.handlers
 
-import aiohttp
-
 from .endpoints.app import App
 from .endpoints.base import Base
 from .endpoints.community_content import CommunityContent
@@ -57,7 +55,6 @@ class DestinyClient():
         max_ratelimit_retries: int = 3,
         log_file: str = "logs/destipy.log",
         logger = None,
-        session: aiohttp.ClientSession = None
     ) -> None:
 
         default_logger = logging.getLogger("Destipy")
@@ -73,10 +70,7 @@ class DestinyClient():
             default_logger.handlers.clear()
         default_logger.addHandler(file_handler)
         self.logger = default_logger if logger is None else logger
-        
-        if session is None:
-            session = aiohttp.ClientSession()
-        requester = Requester(api_key, max_ratelimit_retries, self.logger, session)
+        requester = Requester(api_key, max_ratelimit_retries, self.logger)
         self.app: App = App(client_id, requester, self.logger)
         self.base: Base = Base(requester, self.logger)
         self.community_content: CommunityContent = CommunityContent(requester, self.logger)
@@ -85,7 +79,7 @@ class DestinyClient():
         self.fireteam: Fireteam = Fireteam(requester, self.logger)
         self.forum: Forum = Forum(requester, self.logger)
         self.group_v2: GroupV2 = GroupV2(requester, self.logger)
-        self.manifest: Manifest = Manifest(self.destiny2, session)
+        self.manifest: Manifest = Manifest(self.destiny2)
         self.oauth: OAuth = OAuth(client_id, client_secret, requester, redirect_uri, self.logger)
         self.social: Social = Social(requester, self.logger)
         self.tokens: Tokens = Tokens(requester, self.logger)
