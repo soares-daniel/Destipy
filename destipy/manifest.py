@@ -4,7 +4,7 @@ which is used to download and extract the manifest from Bungie's servers.
 
 Note:
     Most of the code is taken from:
-        https://github.com/jgayfer/pydest/blob/master/pydest/manifest.py
+        https://github.com/jgayfer/pydest/blob/master/pydest/dbase.py
 """
 import json
 import os
@@ -28,8 +28,8 @@ class Manifest:
     def __init__(self, destiny2, session: aiohttp.ClientSession):
         self.manifest_files = {'en': '', 'fr': '', 'es': '', 'de': '', 'it': '', 'ja': '', 'pt-br': '', 'es-mx': '',
                                'ru': '', 'pl': '', 'zh-cht': '', 'ko': '', 'zh-chs': ''}
-        self.destiny2 = destiny2
         self.session = session
+        self.destiny2 = destiny2
 
     async def decode_hash(self, hash_id: int, definition: str, language: str):
         """Decodes a hash id into a json object.

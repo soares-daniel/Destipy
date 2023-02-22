@@ -90,10 +90,10 @@ class Requester:
             else:
                 kwargs["json"] = data
 
-        async with self.session as session:
+        async with self.session:
             taken_time = time.monotonic()
             # Make the request using the ClientSession.request method
-            async with session.request(method.value, url, headers=headers, **kwargs) as response:
+            async with self.session.request(method.value, url, headers=headers, **kwargs) as response:
                 response_time = time.monotonic() - taken_time
                 if response.status != http.HTTPStatus.OK:
                     self.logger.warning(f"{method.value} {url} -> {response.status} {response.reason} ({response_time:.2f}s)")
@@ -105,4 +105,4 @@ class Requester:
                     return {}
                 # Return the response as a json. Provide the user the ability to handle the status code
                 return await response.json()
-        
+             
