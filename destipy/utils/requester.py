@@ -46,7 +46,7 @@ class Requester:
                 retries+=1
         if response.content_type != "application/json":
             raise DestipyHTTPError(
-                f"Wrong content type: {response.content_type}. You may being rate limited.",
+                f"Wrong content type: {response.content_type}. You may being rate limited. \n {response.text}",
                 response.status,
             )
         return response
