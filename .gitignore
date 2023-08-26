@@ -5,3 +5,5 @@
 #PyPi
 dist
 Destipy.egg-info
+
+upload_dist.txt
