@@ -28,8 +28,12 @@ class Manifest:
     def __init__(self, destiny2):
         self.manifest_files = {'en': '', 'fr': '', 'es': '', 'de': '', 'it': '', 'ja': '', 'pt-br': '', 'es-mx': '',
                                'ru': '', 'pl': '', 'zh-cht': '', 'ko': '', 'zh-chs': ''}
-        self.session = aiohttp.ClientSession()
+        self.session = None
         self.destiny2 = destiny2
+
+    async def init(self):
+        if self.session is None:
+            self.session = aiohttp.ClientSession()
 
     async def decode_hash(self, hash_id: int, definition: str, language: str):
         """Decodes a hash id into a json object.
@@ -99,6 +103,7 @@ class Manifest:
         self.manifest_files[language] = manifest_file_name
 
     async def _download_file(self, url, name):
+        await self.init()
         with async_timeout.timeout(10):
             async with self.session.get(url) as response:
                 filename = os.path.basename(name)

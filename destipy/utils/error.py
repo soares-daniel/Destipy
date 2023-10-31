@@ -1,5 +1,12 @@
 import http
 
+class InvalidStateException(Exception):
+    """Invalid state error class for destipy."""
+    def __init__(self, message):
+        self.message = message
+
+    def __str__(self):
+        return f'Invalid state error: {self.message}'
 
 class DestipyException(Exception):
     """Base exception class for all exceptions raised by destipy.

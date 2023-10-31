@@ -1,6 +1,8 @@
 import uuid
 from urllib.parse import parse_qs, urlparse
 
+from destipy.utils.error import InvalidStateException
+
 from .utils.http_method import HTTPMethod
 from .utils.requester import Requester
 
@@ -73,6 +75,8 @@ class OAuth:
                 return await self.requester.request(HTTPMethod.POST, url, data=payload,
                                                     oauth=True, client_id=self.client_id,
                                                     client_secret=self.client_secret)
+            else:
+                raise InvalidStateException("State is invalid")
         except Exception as ex:
             self.logger.exception(f"Error fetching token. Reason: {ex}")
 
