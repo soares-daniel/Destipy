@@ -8,124 +8,132 @@ class Social:
         self.logger = logger
         self.SOCIAL_URL = "https://www.bungie.net/Platform/Social/"
 
-    async def GetFriendList(self, token: dict) -> dict:
+    async def GetFriendList(self, access_token: str, membership_id: str) -> dict:
         """Returns your Bungie Friend list
 
         Args:
-            token (dict): The token for authentication
+            access_token (str): The token for authentication
+            membership_id (str): The membership id of the user you wish to get the friend list of.
 
         Returns:
             dict: The friend list
         """
         try:
-            self.logger.info("Getting friend list for {}...".format(token["membership_id"]))
+            self.logger.info("Getting friend list for {}...".format(membership_id))
             url = self.SOCIAL_URL + "Friends/"
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetFriendRequestList(self, token: dict) -> dict:
+    async def GetFriendRequestList(self, access_token: str, membership_id: int) -> dict:
         """Returns your friend request queue.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
+            membership_id (int): The membership id of the user you wish to get the friend request list of.
 
         Returns:
             dict: The friend request queue
         """
         try:
-            self.logger.info("Getting friend request list for {}...".format(token["membership_id"]))
+            self.logger.info("Getting friend request list for {}...".format(membership_id))
             url = self.SOCIAL_URL + "Friends/Requests/"
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def IssueFriendRequest(self, token: dict, membership_id: str) -> dict:
+    async def IssueFriendRequest(self, access_token: str, membership_id: str, to_issue_membership_id) -> dict:
         """Requests a friend relationship with the target user.
         Any of the target user's linked membership ids are valid inputs.
 
         Args:
-            token (dict): The token to use for authentication
-            membership_id (str): The membership id of the user you wish to add.
+            access_token (str): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
+            to_issue_membership_id (str): The membership id of the user you wish to add.
 
         Returns:
             dict: Whether or not the friend request was issued.
         """
         try:
-            self.logger.info("Issuing friend request to {} for {}...".format(membership_id, token["membership_id"]))
+            self.logger.info("Issuing friend request to {} for {}...".format(to_issue_membership_id, membership_id))
             url = self.SOCIAL_URL + "Friends/Add/{}/".format(membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data={})
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def AcceptFriendRequest(self, token: dict, membership_id: str) -> dict:
+    async def AcceptFriendRequest(self, access_token: str, membership_id: str, to_accept_membership_id) -> dict:
         """Accepts a friend relationship with the target user.
         The user must be on your incoming friend request list, though no error will occur if they are not.
 
         Args:
-            token (dict): The token to use for authentication
-            membership_id (str): The membership id of the user you wish to accept.
+            access_token (str): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
+            to_accept_membership_id (str): The membership id of the user you wish to accept.
 
         Returns:
             dict: Whether or not the friend request was accepted.
         """
         try:
-            self.logger.info("Accepting friend request from {} for {}...".format(membership_id, token["membership_id"]))
+            self.logger.info("Accepting friend request from {} for {}...".format(to_accept_membership_id, membership_id))
             url = self.SOCIAL_URL + "Friends/Requests/Accept/{}/".format(membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data={})
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def DeclineFriendRequest(self, token: dict, membership_id: str) -> dict:
+    async def DeclineFriendRequest(self, access_token: str, membership_id: str, to_decline_membership_id: str) -> dict:
         """Declines a friend relationship with the target user.
         The user must be on your incoming friend request list, though no error will occur if they are not.
 
         Args:
-            token (dict): The token to use for authentication
-            membership_id (str): The membership id of the user you wish to decline.
+            access_token (str): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
+            to_decline_membership_id (str): The membership id of the user you wish to decline.
 
         Returns:
             dict: Whether or not the friend request was declined.
         """
         try:
-            self.logger.info("Decline friend request from {} for {}...".format(membership_id, token["membership_id"]))
+            self.logger.info("Decline friend request from {} for {}...".format(to_decline_membership_id, membership_id))
             url = self.SOCIAL_URL + "Friends/Add/{}/".format(membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data={})
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def RemoveFriend(self, token: dict, membership_id: str) -> dict:
+    async def RemoveFriend(self, access_token: str, membership_id: str, to_remove_membership_id: str) -> dict:
         """Remove a friend relationship with the target user.
         The user must be on your friend list, though no error will occur if they are not.
 
         Args:
-            token (dict): The token to use for authentication
-            membership_id (str): The membership id of the user you wish to remove.
+            access_token (str): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
+            to_remove_membership_id (str): The membership id of the user you wish to remove.
 
         Returns:
             dict: Whether or not the friend was removed.
         """
         try:
-            self.logger.info("Removing friend {} for {}...".format(membership_id, token["membership_id"]))
+            self.logger.info("Removing friend {} for {}...".format(to_remove_membership_id, membership_id))
             url = self.SOCIAL_URL + "Friends/Remove/{}/".format(membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data={})
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def RemoveFriendRequest(self, token: dict, membership_id: str) -> dict:
+    async def RemoveFriendRequest(self, access_token: str, membership_id: str, to_remove_membership_id: str) -> dict:
         """Remove a friend relationship with the target user. The user must be on your outgoing request friend list, though no error will occur if they are not.
 
         Args:
-            token (dict): The token to use for authentication
-            membership_id (str): The membership id of the user you wish to remove.
+            access_token (str): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
+            to_remove_membership_id (str): The membership id of the user you wish to remove.
+            
 
         Returns:
             dict: Whether or not the friend request was removed.
         """
         try:
-            self.logger.info("Removing friend request from {} for {}...".format(membership_id, token["membership_id"]))
+            self.logger.info("Removing friend request from {} for {}...".format(to_remove_membership_id, membership_id))
             url = self.SOCIAL_URL + "Friends/Requests/Remove/{}/".format(membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data={})
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data={})
         except Exception as ex:
             self.logger.exception(ex)
 

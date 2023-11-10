@@ -89,6 +89,7 @@ class Requester:
             else:
                 kwargs["json"] = data
 
+        # TODO: Implement proper handling of http errors without sending request if not 200
         async with aiohttp.ClientSession() as session:
             taken_time = time.monotonic()
             # Make the request using the ClientSession.request method

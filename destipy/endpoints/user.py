@@ -42,11 +42,11 @@ class User:
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetCredentialTypesForTargetAccount(self, token: dict, membership_id: int) -> dict:
+    async def GetCredentialTypesForTargetAccount(self, access_token: str, membership_id: int) -> dict:
         """Returns a list of credential types attached to the requested account
 
         Args:
-            token (dict): OAuth token to use for authentication
+            access_token (str): OAuth token to use for authentication
             membership_id (int): The user's membership id
 
         Returns:
@@ -55,7 +55,7 @@ class User:
         try:
             self.logger.info("Getting credential types for target account for {membership_id}...")
             url = self.USER_URL + "GetCredentialTypesForTargetAccount/{}/".format(membership_id)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -92,20 +92,20 @@ class User:
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetMembershipDataForCurrentUser(self, token: dict) -> dict:
+    async def GetMembershipDataForCurrentUser(self, access_token: str) -> dict:
         """Returns a list of accounts associated with signed in user.
         This is useful for OAuth implementations that do not give you access to the token response.
 
         Args:
-            token (dict): OAuth token to use for authentication
+            access_token (str): OAuth token to use for authentication.
 
         Returns:
             dict: The user data
         """
         try:
-            self.logger.info(f"Getting membership data for current user for {token['membership_id']}...")
+            self.logger.info("Getting membership data for current user...")
             url = self.USER_URL + "GetMembershipsForCurrentUser/"
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 

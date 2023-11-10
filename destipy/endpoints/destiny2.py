@@ -26,7 +26,7 @@ class Destiny2:
 
     async def GetDestinyEntitydefinition(
         self,
-        token: dict,
+        access_token: str,
         entity_type: str,
         hash_identifier: int
     ) -> dict:
@@ -36,7 +36,7 @@ class Destiny2:
         Please don't use this as a chatty alternative to the Manifest database if you require large sets of data, but for simple and one-off accesses this should be handy.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             entity_type (str): The type of entity for whom you would like results.
                 These correspond to the entity's async definition contract name.
                 For instance, if you are looking for items, this property should be 'DestinyInventoryItemasync definition'.
@@ -51,7 +51,7 @@ class Destiny2:
             self.logger.info("Getting Destiny Entity async definition for hash {}...".format(hash_identifier))
             url = self.DESTINY2_URL + "Manifest/{}/{}/"
             url = url.format(entity_type, hash_identifier)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -90,7 +90,7 @@ class Destiny2:
 
     async def GetLinkedProfiles(
         self,
-        token: dict,
+        access_token: str,
         membership_id: int,
         membership_type: int,
         get_all_memberships: bool = False
@@ -101,7 +101,7 @@ class Destiny2:
         Note that it will only return linked accounts whose linkages you are allowed to view.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             membership_id (int): The ID of the membership whose linked Destiny accounts you want returned.
                 Make sure your membership ID matches its Membership Type: don't pass us a PSN membership ID and the XBox membership type, it's not going to work!
             membership_type (int): The type for the membership whose linked Destiny accounts you want returned.
@@ -117,7 +117,7 @@ class Destiny2:
             self.logger.info("Getting linked profiles for member {}...".format(membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/LinkedProfiles/?get_all_memberships={}"
             url = url.format(membership_type, membership_id, params_dict[get_all_memberships])
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -151,7 +151,7 @@ class Destiny2:
 
     async def GetCharacter(
         self,
-        token: dict,
+        access_token: str,
         character_id: int,
         destiny_membership_id: int,
         membership_type: int,
@@ -160,7 +160,7 @@ class Destiny2:
         """Returns character information for the supplied character.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             character_id (int): The ID of the character.
             destiny_membership_id (int): Destiny membership ID.
             membership_type (int): A valid non-BungieNet membership type.
@@ -177,7 +177,7 @@ class Destiny2:
             self.logger.info("Getting character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/?components={}"
             url = url.format(membership_type, destiny_membership_id, character_id, ','.join([str(i) for i in components]))
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -243,7 +243,7 @@ class Destiny2:
 
     async def GetVendors(
         self,
-        token: dict,
+        access_token: str,
         character_id: int,
         destiny_membership_id: int,
         membership_type: int,
@@ -255,7 +255,7 @@ class Destiny2:
         Use their definitions as-is for those.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             character_id (int): The Destiny Character ID of the character whom we're getting vendor info.
             destiny_membership_id (int): Destiny membership ID of another user.
             membership_type (int): A valid non-BungieNet membership type.
@@ -275,13 +275,13 @@ class Destiny2:
             self.logger.info("Getting vendor details for character {} of account {}...".format(character_id, destiny_membership_id))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/Vendors/?components={}&filter={}"
             url = url.format(membership_type, destiny_membership_id, character_id, ','.join([str(i) for i in components]), filter)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def GetVendor(
         self,
-        token: dict,
+        access_token: str,
         character_id: int,
         destiny_membership_id: int,
         membership_type: int,
@@ -291,7 +291,7 @@ class Destiny2:
         """Get the details of a specific Vendor.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             character_id (int): The Destiny Character ID of the character whom we're getting vendor info.
             destiny_membership_id (int): Destiny membership ID of another user. You may be denied.
             membership_type (int): A valid non-BungieNet membership type.
@@ -309,7 +309,7 @@ class Destiny2:
             self.logger.info("Getting vendor details of vendor_hash {}...".format(vendor_hash))
             url = self.DESTINY2_URL + "{}/Profile/{}/Character/{}/Vendors/{}/?components={}"
             url = url.format(membership_type, destiny_membership_id, character_id, vendor_hash, ','.join([str(i) for i in components]))
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -372,7 +372,7 @@ class Destiny2:
 
     async def TransferItem(
         self,
-        token: dict,
+        access_token: str,
         item_reference_hash: int,
         stack_size: int,
         transfer_to_vault: bool,
@@ -384,7 +384,7 @@ class Destiny2:
         You must also pass BOTH a reference AND an instance ID if it's an instanced item.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             item_reference_hash (int): The hash identifier of the item to be transferred.
                 Mapped to the DestinyInventoryItemDefinition.
             stack_size (int): *
@@ -407,13 +407,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/TransferItem/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def PullFromPostmaster(
         self,
-        token: dict,
+        access_token: str,
         item_reference_hash: int,
         stack_size: int,
         item_id: int,
@@ -426,7 +426,7 @@ class Destiny2:
 
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             item_reference_hash (int): The hash identifier of the item to be transferred.
                 Mapped to the DestinyInventoryItemDefinition.
             stack_size (int): *
@@ -447,13 +447,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/PullFromPostmaster/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def EquipItem(
         self,
-        token: dict,
+        access_token: str,
         item_id: int,
         character_id: int,
         membership_type: int
@@ -462,7 +462,7 @@ class Destiny2:
         You must have a valid Destiny Account, and either be in a social space, in orbit, or offline.
 
         Args:
-            token (dict): The token to use for authentication.
+            access_token (str): The token to use for authentication.
             item_id (int): The instance ID of the item to equip.
             character_id (int): The Destiny Character ID of the character whom is requesting the transfer.
             membership_type (int): A valid non-BungieNet membership type.
@@ -478,13 +478,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/EquipItem/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def EquipItems(
         self,
-        token: dict,
+        access_token: str,
         item_ids: list,
         character_id: int,
         membership_type: int
@@ -494,7 +494,7 @@ class Destiny2:
         Any items not found on your character will be ignored.
 
         Args:
-            token (dict): The token for authentication
+            access_token (str): The token for authentication
             item_ids (list): The list of item instance IDs to equip.
             character_id (int): The Destiny Character ID of the character whom is requesting the transfer.
             membership_typ (int): A valid non-BungieNet membership type.
@@ -510,13 +510,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/EquipItems/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def SetItemLockState(
         self,
-        token: dict,
+        access_token: str,
         state: bool,
         item_id: int,
         character_id: int,
@@ -526,7 +526,7 @@ class Destiny2:
         You must have a valid Destiny Account.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
             state (bool): The desired state of the lock.
             item_id (int): The instance ID of the item to lock.
             character_id (int): The Destiny Character ID of the character whom is requesting the transfer.
@@ -544,13 +544,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/SetLockState/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def SetQuestTrackedState(
         self,
-        token: dict,
+        access_token: str,
         state: bool,
         item_id: int,
         character_id: int,
@@ -560,7 +560,7 @@ class Destiny2:
         You must have a valid Destiny Account. Yeah, it's an item.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
             state (bool): The desired state of the lock.
             item_id (int): The instance ID of the item to lock.
             character_id (int): The Destiny Character ID of the character whom is requesting the transfer.
@@ -578,13 +578,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/SetTrackedState/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def InsertSocketPlug(
         self,
-        token: dict,
+        access_token: str,
         action_token: str,
         item_instance_id: int,
         socket_index: int,
@@ -600,7 +600,7 @@ class Destiny2:
         Request must include proof of permission for 'InsertPlugs' from the account owner.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
             action_token (str): The action token provided by the AwaGetActionToken API call.
             item_instance_id (int): The instance ID of the item having a plug inserted.
                 Only instanced items can have sockets.
@@ -635,13 +635,13 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/InsertSocketPlug/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def InsertSocketPlugFree(
         self,
-        token: dict,
+        access_token: str,
         socket_index: int,
         socket_array_type: int,
         plug_item_hash: int,
@@ -686,7 +686,7 @@ class Destiny2:
                 "membershipType": membership_type
             }
             url = self.DESTINY2_URL + "Actions/Items/InsertSocketPlugFree/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -708,7 +708,7 @@ class Destiny2:
 
     async def ReportOffensivePostGameCarnageReportPlayer(
         self,
-        token: dict,
+        access_token: str,
         activity_id: int,
         reason_category_hashes: list,
         reason_hashes: list,
@@ -719,7 +719,7 @@ class Destiny2:
         Please use this judiciously and only when you have strong suspicions of violation, pretty please.
 
         Args:
-            token (dict): The token to use for authorization.
+            access_token (str): The token to use for authorization.
             activity_id (int): The ID of the activity where you ran into the brigand that you're reporting.
             reason_category_hashes (list): So you've decided to report someone instead of cursing them and their descendants.
                 Well, okay then.
@@ -743,7 +743,7 @@ class Destiny2:
             }
             url = self.DESTINY2_URL + "Stats/PostGameCarnageReport/{}/Report/"
             url = url.format(activity_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -1094,7 +1094,7 @@ class Destiny2:
 
     async def AwaInitializeRequest(
         self,
-        token: dict,
+        access_token: str,
         type: int,
         affected_item_id: int,
         membership_type: int,
@@ -1103,7 +1103,7 @@ class Destiny2:
         """Initialize a request to perform an advanced write action.
 
         Args:
-            token (dict): The token for authentication
+            access_token (str): The token for authentication
             type (int): Type of advanced write action.
             affected_item_id (int): Item instance ID the action shall be applied to.
                 This is optional for all but a new AwaType values.
@@ -1123,13 +1123,13 @@ class Destiny2:
                 "characterId": character_id
             }
             url = self.DESTINY2_URL + "Awa/Initialize/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def AwaProvideAuthorizationResult(
         self,
-        token: dict,
+        access_token: str,
         selection: int,
         correlation_id: str,
         nonce: list
@@ -1138,7 +1138,7 @@ class Destiny2:
         Called by the Bungie Destiny App to approve or reject a request.
 
         Args:
-            token (dict): The token for authentication
+            access_token (str): The token for authentication
             selection (int): Indication of the selection the user has made (Approving or rejecting the action)
             correlation_id (str): Correlation ID of the request
             nonce (list): Secret nonce received via the PUSH notification.
@@ -1154,15 +1154,15 @@ class Destiny2:
                 "nonce": nonce
             }
             url = self.DESTINY2_URL + "Awa/AwaProvideAuthorizationResult/"
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"], data=payload)
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token, data=payload)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetAwaGetActionToken(self, token: dict, correlation_id: str) -> dict:
+    async def GetAwaGetActionToken(self, access_token: str, correlation_id: str) -> dict:
         """Returns the action token if user approves the request.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
             correlation_id (str): The identifier for the advanced write action request.
 
         Returns:
@@ -1171,6 +1171,6 @@ class Destiny2:
         try:
             self.logger.info("Getting action token...")
             url = self.DESTINY2_URL + "Awa/GetActionToken/{}".format(correlation_id)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)

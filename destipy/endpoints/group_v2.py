@@ -35,11 +35,11 @@ class GroupV2:
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetUserClanInviteSetting(self, token: dict, m_type: int) -> dict:
+    async def GetUserClanInviteSetting(self, access_token: str, m_type: int) -> dict:
         """Gets the state of the user's clan invite preferences for a particular membership type - true if they wish to be invited to clans, false otherwise.
 
         Args:
-            token (dict): The token for authentication.
+            access_token (str): The token for authentication.
             m_type (int): The Destiny membership type of the account we wish to access settings.
 
         Returns:
@@ -48,7 +48,7 @@ class GroupV2:
         try:
             self.logger.info("Getting user clan invite setting...")
             url = self.GROUPV2_URL + "GetUserClanInviteSetting/{}/".format(m_type)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -197,7 +197,7 @@ class GroupV2:
 
     async def EditGroup(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         name: str = None,
         about: str = None,
@@ -220,7 +220,7 @@ class GroupV2:
         This latest revision will only edit the fields you pass in - pass null for properties you want to leave unaltered.
 
         Args:
-            token (dict): The token of the admin requesting the edit.
+            access_token (str): The token of the admin requesting the edit.
             group_id (int): The ID of the group to edit.
             name (str, optional): The new name of the group. Defaults to None.
             about (str, optional): The new about text of the group. Defaults to None.
@@ -263,13 +263,13 @@ class GroupV2:
                 "defaultPublicity": defaultPublicity,
             }
             url = self.GROUPV2_URL + "{}/Edit".format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def EditClanBanner(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         decal_id: int,
         decal_color_id: int,
@@ -284,7 +284,7 @@ class GroupV2:
         All fields are required.
 
         Args:
-            token (dict): The token of the admin requesting the edit.
+            access_token (str): The token of the admin requesting the edit.
             group_id (int): The ID of the group to edit
             decal_id (int, optional): The new decal ID of the group. Defaults to None.
             decal_color_id (int, optional): The new decal color ID of the group. Defaults to None.
@@ -309,13 +309,13 @@ class GroupV2:
                 "gonfalonDetailColorId": gonfalon_detail_color_id,
             }
             url = self.GROUPV2_URL + "{}/EditClanBanner".format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def EditFounderOptions(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         invite_permission_override: bool,
         update_culture_permission_override: bool,
@@ -327,7 +327,7 @@ class GroupV2:
         You must have suitable permissions in the group to perform this operation.
 
         Args:
-            token (dict): The token of the admin requesting the edit.
+            access_token (str): The token of the admin requesting the edit.
             group_id (int): The ID of the group to edit.
             invite_permission_override (bool, optional): Minimum Member Level allowed to invite new members to group
                 Always Allowed: Founder, Acting Founder
@@ -368,13 +368,13 @@ class GroupV2:
                 "joinLevel": join_level,
             }
             url = self.GROUPV2_URL + "{}/EditFounderOptions".format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def AddOptionalConversation(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         chat_name: str,
         chat_security: int,
@@ -383,7 +383,7 @@ class GroupV2:
         Requires admin permissions to the group.
 
         Args:
-            token (dict): The token of the admin requesting the edit.
+            access_token (str): The token of the admin requesting the edit.
             group_id (int): The ID of the group to edit.
             chat_name (str): The name of the chat.
             chat_security (int): The security level of the chat.
@@ -398,13 +398,13 @@ class GroupV2:
                 "chatSecurity": chat_security,
             }
             url = self.GROUPV2_URL + "{}/OptionalConversations/Add/".format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def EditOptionalConversation(
         self,
-        token: dict,
+        access_token: str,
         conversation_id: int,
         group_id: int,
         chat_enabled: bool,
@@ -416,7 +416,7 @@ class GroupV2:
 
 
         Args:
-            token (dict): The token of the admin requesting the edit.
+            access_token (str): The token of the admin requesting the edit.
             conversation_id (int): Conversation Id of the channel being edited.
             group_id (int): The ID of the group to edit.
             chat_name (str): The name of the chat.
@@ -433,7 +433,7 @@ class GroupV2:
                 "chatSecurity": chat_security,
             }
             url = self.GROUPV2_URL + "{}/OptionalConversations/Edit/{}".format(group_id, conversation_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -487,7 +487,7 @@ class GroupV2:
 
     async def EditGroupMembership(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int,
@@ -497,7 +497,7 @@ class GroupV2:
         You must have suitable permissions in the group to perform this operation.
 
         Args:
-            token (dict): The token of the admin requesting the edit.
+            access_token (str): The token of the admin requesting the edit.
             group_id (int): ID of the group to which the member belongs.
             membership_id (int): Membership ID to modify.
             membership_type (int): Membership type of the provide membership ID.
@@ -514,13 +514,13 @@ class GroupV2:
             self.logger.info("Editing group membership...")
             url = self.GROUPV2_URL + "{}/Members/{}/{}/SetMembershipType/{}"
             url = url.format(group_id, membership_type, membership_id, member_type)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def KickMember(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int,
@@ -529,7 +529,7 @@ class GroupV2:
         You must have suitable permissions in the group to perform this operation.
 
         Args:
-            token (dict): The token of the admin requesting the kick.
+            access_token (str): The token of the admin requesting the kick.
             group_id (int): ID of the group to which the member belongs.
             membership_id (int): Membership ID to kick.
             membership_type (int): Membership type of the provide membership ID.
@@ -542,13 +542,13 @@ class GroupV2:
             self.logger.info("Kicking member...")
             url = self.GROUPV2_URL + "{}/Members/{}/{}/Kick/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def BanMember(
             self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int,
@@ -558,7 +558,7 @@ class GroupV2:
         """Bans the requested member from the requested group for the specified period of time.
 
         Args:
-            token (dict): The token of the admin requesting the ban.
+            access_token (str): The token of the admin requesting the ban.
             group_id (int): Group ID that has the member to ban.
             membership_id (int): Membership ID of the member to ban from the group.
             membership_type (int): Membership type of the provide membership ID.
@@ -578,13 +578,13 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/{}/{}/Ban/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def UnbanMember(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int
@@ -592,7 +592,7 @@ class GroupV2:
         """Unbans the requested member, allowing them to re-apply for membership.
 
         Args:
-            token (dict): The token of the admin requesting the unban.
+            access_token (str): The token of the admin requesting the unban.
             group_id (int): Group ID that has the member to unban.
             membership_id (int): Membership ID of the member to unban from the group
             membership_type (int): Membership type of the provided membership ID.
@@ -605,7 +605,7 @@ class GroupV2:
             self.logger.info("Unbanning member...")
             url = self.GROUPV2_URL + "{}/Members/{}/{}/Unban/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data={}, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -654,12 +654,12 @@ class GroupV2:
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetPendingMemberships(self, token: dict, current_page: int, group_id: int) -> dict:
+    async def GetPendingMemberships(self, access_token: str, current_page: int, group_id: int) -> dict:
         """Get the list of users who are awaiting a decision on their application to join a given group.
         Modified to include application info.
 
         Args:
-            token (dict): The token of the admin requesting the pending members.
+            access_token (str): The token of the admin requesting the pending members.
             current_page (int): Page number (starting with 1). Each page has a fixed size of 50 entries.
             group_id (int): Group ID whose pending members you are fetching.
 
@@ -670,15 +670,15 @@ class GroupV2:
             self.logger.info("Getting pending members...")
             url = self.GROUPV2_URL + "{}/Members/Pending/?currentPage={}"
             url = url.format(group_id, current_page)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetInvitedIndividuals(self, token: dict, current_page: int, group_id: int) -> dict:
+    async def GetInvitedIndividuals(self, access_token: str, current_page: int, group_id: int) -> dict:
         """Get the list of users who have been invited into the group.
 
         Args:
-            token (dict): The token of the admin requesting the invited members.
+            access_token (str): The token of the admin requesting the invited members.
             current_page (int): Page number (starting with 1). Each page has a fixed size of 50 entries.
             group_id (int): Group ID whose invited members you are fetching.
 
@@ -689,15 +689,15 @@ class GroupV2:
             self.logger.info("Getting invited members...")
             url = self.GROUPV2_URL + "{}/Members/InvitedIndividuals/?currentPage={}"
             url = url.format(group_id, current_page)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def ApproveAllPending(self, token: dict, group_id: int, message: str = "") -> dict:
+    async def ApproveAllPending(self, access_token: str, group_id: int, message: str = "") -> dict:
         """Approve all of the pending users for the given group.
 
         Args:
-            token (dict): The token of the admin requesting the approval.
+            access_token (str): The token of the admin requesting the approval.
             group_id (int): Group ID whose pending members you are approving.
             message (str, optional): Message to send to the users. Defaults to "".
 
@@ -711,15 +711,15 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/ApproveAll/"
             url = url.format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def DenyAllPending(self, token: dict, group_id: int, message: str = "") -> dict:
+    async def DenyAllPending(self, access_token: str, group_id: int, message: str = "") -> dict:
         """Deny all of the pending users for the given group.
 
         Args:
-            token (dict): The token of the admin requesting the denial.
+            access_token (str): The token of the admin requesting the denial.
             group_id (int): Group ID whose pending members you are denying.
             message (str, optional): Message to send to the users. Defaults to "".
 
@@ -733,13 +733,13 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/DenyAll/"
             url = url.format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def ApprovePendingForList(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         memberships: list,
         message: str = ""
@@ -747,7 +747,7 @@ class GroupV2:
         """Approve all of the pending users for the given group.
 
         Args:
-            token (dict): The token of the admin requesting the approval.
+            access_token (str): The token of the admin requesting the approval.
             group_id (int): Group ID whose pending members you are approving.
             membership_ids (list): List of memberships to approve.
                 A Membership consists of a dict with following properties:
@@ -765,13 +765,13 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/ApproveList/"
             url = url.format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def ApprovePending(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int,
@@ -780,7 +780,7 @@ class GroupV2:
         """Approve the given membershipId to join the group/clan as long as they have applied.
 
         Args:
-            token (dict): The token of the admin requesting the approval.
+            access_token (str): The token of the admin requesting the approval.
             group_id (int): Group ID whose pending members you are approving.
             membership_id (int): Membership ID of the user to approve.
             membership_type (int): Membership type of the user to approve.
@@ -796,13 +796,13 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/Approve/{}/{}/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def DenyPendingForList(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         memberships: list,
         message: str = ""
@@ -810,7 +810,7 @@ class GroupV2:
         """Deny all of the pending users for the given group that match the passed-in.
 
         Args:
-            token (dict): The token of the admin requesting the denial.
+            access_token (str): The token of the admin requesting the denial.
             group_id (int): Group ID whose pending members you are denying.
             memberships (list): List of memberships to deny.
                 A Membership consists of a dict with following properties:
@@ -826,7 +826,7 @@ class GroupV2:
             }
             url = self.GROUPV2_URL + "{}/Members/DenyList/"
             url = url.format(group_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -912,7 +912,7 @@ class GroupV2:
 
     async def IndividualGroupInvite(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int,
@@ -921,7 +921,7 @@ class GroupV2:
         """Invite a user to join this group.
 
         Args:
-            token (dict): The token used for authentication
+            access_token (str): The token used for authentication
             group_id (int): ID of the group you would like to join.
             destiny_membership_id (int): Destiny Membership id of the account being invited.
 
@@ -939,13 +939,13 @@ class GroupV2:
             payload = {
                     "message": message
             }
-            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, data=payload, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def IndividualGroupInviteCancel(
         self,
-        token: dict,
+        access_token: str,
         group_id: int,
         membership_id: int,
         membership_type: int,
@@ -953,7 +953,7 @@ class GroupV2:
         """Cancels a pending invitation to join a group.
 
         Args:
-            token (dict): The token to user for admin operations.
+            access_token (str): The token to user for admin operations.
             group_id (int): ID of the group you would like to join.
             membership_id (int): Membership id of the account being invited.
             membership_type (int): MembershipType of the account being invited. The types of membership the Accounts system supports.
@@ -966,6 +966,6 @@ class GroupV2:
             self.logger.info("Cancelling invite for {} to group {}...".format(membership_id, group_id))
             url = self.GROUPV2_URL + "{}/Members/IndividualInviteCancel/{}/{}/"
             url = url.format(group_id, membership_type, membership_id)
-            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.POST, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)

@@ -9,21 +9,22 @@ class Fireteam:
         self.logger = logger
         self.FIRETEAM_URL = "https://www.bungie.net/Platform/Fireteam/"
 
-    async def GetActivePrivateClanFireteamCount(self, token: dict, group_id: int) -> dict:
+    async def GetActivePrivateClanFireteamCount(self, access_token: str, membership_id: str, group_id: int) -> dict:
         """Gets a count of all active non-public fireteams for the specified clan.
         Maximum value returned is 25.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
             group_id (int): The group id of the clan.
 
         Returns:
             dict: The count of all active non-public fireteams for the specified clan.
         """
         try:
-            self.logger.info("Getting active non-public fireteam count for {} for clan {}...".format(token["membership_id"], group_id))
+            self.logger.info("Getting active non-public fireteam count for {} for clan {}...".format(membership_id, group_id))
             url = self.FIRETEAM_URL + "Clan/{}/ActiveCount/".format(group_id)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
@@ -63,7 +64,7 @@ class Fireteam:
 
     async def SearchPublicAvailableClanFireteams(
         self,
-        token: dict,
+        access_token: str,
         activity_type: int,
         date_range: int,
         page: int,
@@ -75,7 +76,7 @@ class Fireteam:
         Caller is not checked for join criteria so caching is maximized.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
             activity_type (int): The activity type to filter by.
             date_range (int): The date range to grab available fireteams.
             page (int): Zero based page
@@ -93,13 +94,13 @@ class Fireteam:
             self.logger.info("Getting available clan fireteams...")
             url = self.FIRETEAM_URL + "Search/Available/{}/{}/{}/{}/?lang_filter={}"
             url = url.format(platform, activity_type, date_range, slot_filter, page, lang_filter)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
     async def GetMyClanFireteams(
         self,
-        token: dict,
+        membership_id: str,
         group_id: int,
         include_closed: bool,
         page: int,
@@ -110,7 +111,7 @@ class Fireteam:
         """Gets a listing of all fireteams that caller is an applicant, a member, or an alternate of.
 
         Args:
-            token (dict): The token to use for authentication
+            membership_id (str): The membership id of the user itself.
             group_id (int): The group id of the clan. (This parameter is ignored unless the optional query parameter group_filter is true).
             include_closed (bool): If true, return fireteams that have been closed.
             page (int): Deprecated parameter, ignored.
@@ -123,7 +124,7 @@ class Fireteam:
         """
         bool_dict = {True: "true", False: "false"}
         try:
-            self.logger.info("Getting own clan fireteams for {} for clan {}...".format(token["membership_id"], group_id))
+            self.logger.info("Getting own clan fireteams for {} for clan {}...".format(membership_id, group_id))
             url = self.FIRETEAM_URL + "Clan/{}/My/{}/{}/{}/?lang_filter={}&group_filter={}"
             url = url.format(group_id, platform, include_closed, page, lang_filter, bool_dict[group_filter])
             return await self.requester.request(method=HTTPMethod.GET, url=url)
@@ -132,14 +133,14 @@ class Fireteam:
 
     async def GetClanFireteam(
         self,
-        token: dict,
+        access_token: str,
         fireteam_id: int,
         group_id: int
     ) -> dict:
         """Gets a specific fireteam.
 
         Args:
-            token (dict): The token to use for authentication
+            access_token (str): The token to use for authentication
             fireteam_id (int): The unique id of the fireteam.
             group_id (int): The group id of the clan.
 
@@ -149,6 +150,6 @@ class Fireteam:
         try:
             self.logger.info("Getting fireteam {} for clan {}...".format(fireteam_id, group_id))
             url = self.FIRETEAM_URL + "Clan/{}/Summary/{}/".format(group_id, fireteam_id)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)

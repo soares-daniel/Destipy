@@ -12,7 +12,7 @@ class App:
 
     async def GetApplicationApiUsage(
         self,
-        token: dict,
+        access_token: str,
         application_id: int,
         end: str,
         start: str
@@ -22,7 +22,7 @@ class App:
         You must be authenticated with at least the ReadUserData permission to access this endpoint.
 
         Args:
-            token (dict): The authentication token
+            access_token (str): The authentication access_token
             application_id (int, optional): async defaults to the client id in the .env file.
             end (str, optional): End time for query. Use the format YYYY-MM-DD. Goes to now if not specified.
             start (str, optional): Start time for query. Use the format YYYY-MM-DD. Goes to 24 hours ago if not specified.
@@ -42,15 +42,15 @@ class App:
             self.logger.info("Fetching application api usage...")
             url = self.APP_URL + "ApplicationApiUsage/{}/{}"
             url = url.format(application_id, query)
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
 
-    async def GetBungieApplications(self, token: dict) -> dict:
+    async def GetBungieApplications(self, access_token: str) -> dict:
         """Get list of applications created by Bungie.
 
         Args:
-            token (dict): The authentication token
+            access_token (str): The authentication access_token
 
         Returns:
             dict: The bungie applications
@@ -58,6 +58,6 @@ class App:
         try:
             self.logger.info("Getting bungie applications...")
             url = self.APP_URL + "FirstPlay/"
-            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=token["access_token"])
+            return await self.requester.request(method=HTTPMethod.GET, url=url, access_token=access_token)
         except Exception as ex:
             self.logger.exception(ex)
