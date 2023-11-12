@@ -1,0 +1,47 @@
+from enum import Enum
+
+class DestinyComponentType(Enum):
+    """
+    Representing the possible components that can be returned from Destiny "GET" calls such as GetProfile, GetCharacter, GetVendor etc...
+    Reference: https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html
+    """
+    NONE = 0
+    PROFILES = 100
+    VENDOR_RECEIPTS = 101
+    PROFILE_INVENTORIES = 102
+    PROFILE_CURRENCIES = 103
+    PROFILE_PROGRESSION = 104
+    PLATFORM_SILVER = 105
+    CHARACTERS = 200
+    CHARACTER_INVENTORIES = 201
+    CHARACTER_PROGRESSIONS = 202
+    CHARACTER_RENDER_DATA = 203
+    CHARACTER_ACTIVITIES = 204
+    CHARACTER_EQUIPMENT = 205
+    CHARACTER_LOADOUTS = 206
+    ITEM_INSTANCES = 300
+    ITEM_OBJECTIVES = 301
+    ITEM_PERKS = 302
+    ITEM_RENDER_DATA = 303
+    ITEM_STATS = 304
+    ITEM_SOCKETS = 305
+    ITEM_TALENT_GRIDS = 306
+    ITEM_COMMON_DATA = 307
+    ITEM_PLUG_STATES = 308
+    ITEM_PLUG_OBJECTIVES = 309
+    ITEM_REUSABLE_PLUGS = 310
+    VENDORS = 400
+    VENDOR_CATEGORIES = 401
+    VENDOR_SALES = 402
+    KIOSKS = 500
+    CURRENCY_LOOKUPS = 600
+    PRESENTATION_NODES = 700
+    COLLECTIBLES = 800
+    RECORDS = 900
+    TRANSITORY = 1000
+    METRICS = 1100
+    STRING_VARIABLES = 1200
+    CRAFTABLES = 1300
+    SOCIAL_COMMENDATIONS = 1400
+
+# TODO: Add the rest of the enums (MANY...)
