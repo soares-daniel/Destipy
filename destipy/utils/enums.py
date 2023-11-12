@@ -1,6 +1,6 @@
-from enum import Enum
+from enum import IntEnum
 
-class DestinyComponentType(Enum):
+class DestinyComponentType(IntEnum):
     """
     Representing the possible components that can be returned from Destiny "GET" calls such as GetProfile, GetCharacter, GetVendor etc...
     Reference: https://bungie-net.github.io/multi/schema_Destiny-DestinyComponentType.html
