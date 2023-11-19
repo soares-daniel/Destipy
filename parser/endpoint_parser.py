@@ -1,10 +1,20 @@
+import json
+import os
+import shutil
+import subprocess
 from functools import cache
 import requests
 from bs4 import BeautifulSoup
 import logging
 
+from parser.enum_parser import parse_enums
+
 BASE_URL = 'https://bungie-net.github.io/multi/'
-to_fix = []
+ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, 'destipy_v2')
+TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, 'template')
+TARGET_FOLDER = os.path.join(DESTIPY_FOLDER, 'endpoints')
+UTILS_FOLDER = os.path.join(DESTIPY_FOLDER, 'utils')
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -13,6 +23,44 @@ session = requests.Session()
 
 def clean_text(text):
     return ' '.join(text.split())
+
+
+@cache
+def parse_array_contents(url):
+    try:
+        response = session.get(url)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        logging.error(f"HTTP error occurred: {err}")
+        return []
+    except Exception as err:
+        logging.error(f"Other error occurred: {err}")
+        return []
+
+    soup = BeautifulSoup(response.text, 'html.parser')
+    selected = soup.select('.properties .property .box > .box-contents')
+    schema_response = []
+    for prop in selected:
+        if prop.find(class_='title'):
+            key = clean_text(prop.find(class_='title').find_all('strong')[0].text)
+            type_info = prop.find(class_='type-info')
+            if not type_info.find(class_='attributes'):
+                # Nested type
+                href = type_info.find('a')['href']
+                schema_prop = parse_schema_page(BASE_URL + href)
+            else:
+                # Primitive type
+                schema_prop = {
+                    'Name': key,
+                    'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
+                    'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
+                    'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else []
+                }
+            schema_response.append({key: schema_prop})
+        else:
+            logging.warning(f"Skipping prop because it doesn't have a title")
+
+    return schema_response
 
 
 @cache
@@ -29,52 +77,101 @@ def parse_schema_page(url):
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
-    schema_props = []
-    for prop in soup.select('.properties .property .box > .box-contents'):
+    schema_response = {}
+    selected = soup.select('.properties .property .box > .box-contents')
+    for prop in selected:
         if prop.find(class_='title'):
-            key_name = clean_text(prop.find('strong').text)
+            key = clean_text(prop.find(class_='title').find_all('strong')[0].text)
             type_info = prop.find(class_='type-info')
-
-            attributes, description, prop_type = '', '', ''
-            for div in type_info.find_all('div', recursive=False):
-                if 'attributes' in div.get('class', []):
-                    attributes = div.text.strip()
-                elif 'description' in div.get('class', []):
-                    description = div.text.strip()
-                elif 'type' in div.get('class', []):
-                    prop_type = div.text.strip().split(': ')[1]
-
-            if type_info.select_one('.enum-values, .mapped'):
-                continue
-
-            schema_props.append((key_name, attributes, description, prop_type))
+            if not type_info.find(class_='attributes'):
+                # Nested type
+                href = type_info.find('a')['href']
+                schema_prop = parse_schema_page(BASE_URL + href)
+            else:
+                if type_info.find(class_='items'):
+                    # Array type
+                    items = type_info.find(class_='items')
+                    href = items.find('a')['href'] if items.find('a') else None
+                    schema_prop = {
+                        'Name': key,
+                        'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
+                        'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
+                        'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else [],
+                        'Array Contents': parse_array_contents(BASE_URL + href) if href else clean_text(items.text.split(':')[1].strip())
+                    }
+                else:
+                    # Primitive type
+                    schema_prop = {
+                        'Name': key,
+                        'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
+                        'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
+                        'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else []
+                    }
+            schema_response[key] = schema_prop
         else:
             logging.warning(f"Skipping prop because it doesn't have a title")
 
-    return schema_props
+    return schema_response
 
 
 def parse_response_properties(soup):
-    response_props = []
-    for prop in soup.select('.response .property .box-contents'):
-        key_name = clean_text(prop.find('strong').text)
+    response = {}
+    selected = soup.select('.response .property .box-contents')
+    for prop in selected:
+        key = clean_text(prop.find(class_='title').find_all('strong')[0].text)
         type_info = prop.find(class_='type-info')
+        if type_info.find('a'):
+            # Nested type
+            href = type_info.find('a')['href']
+            schema_props = parse_schema_page(BASE_URL + href)
+            response[key] = schema_props
+        else:
+            # Primitive type
+            value = {
+                'Name': key,
+                'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
+                'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
+                'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else []
+            }
+            response[key] = value
+    return response
 
+
+def parse_request_body(soup):
+    select = '.request-body .box-contents'
+    selected = soup.select(select)
+    params = []
+    # Get link
+    for prop in selected:
+        type_info = prop.find(class_='type-info')
         if type_info and type_info.find('a'):
             href = type_info.find('a')['href']
-            linked_props = parse_schema_page(BASE_URL + href)
-            response_props.append((key_name, linked_props))
-        else:
-            attributes = []
-            for div in type_info.find_all('div', recursive=False):
-                if div.find('strong'):
-                    attr_name = clean_text(div.find('strong').text)
-                    attr_value = clean_text(':'.join(div.text.split(':')[1:]))
-                    attributes.append((attr_name, attr_value))
+            try:
+                response = session.get(BASE_URL + href)
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as err:
+                logging.error(f"HTTP error occurred: {err}")
+                return []
+            except Exception as err:
+                logging.error(f"Other error occurred: {err}")
+                return []
 
-            response_props.append((key_name, tuple(attributes) if attributes else ''))
+            soup2 = BeautifulSoup(response.text, 'html.parser')
+            select2 = '.properties .property .box > .box-contents'
+            selected2 = soup2.select(select2)
+            for param in selected2:
+                if 'stop-nesting-boxes' in param.attrs.get('class', []):
+                    continue  # Enums
+                param_name = clean_text(param.find('strong').text)
+                param_type = clean_text(param.find(class_='type').text.split(': ')[1])
+                param_desc = clean_text(param.find(class_='description').text) if param.find(class_='description') else ''
+                param_attributes_spans = param.find(class_='attributes').find_all('span') if param.find(
+                    class_='attributes') else []
+                param_attributes = [clean_text(span.text) for span in param_attributes_spans]
 
-    return response_props
+                params.append((param_name, param_type, param_desc, param_attributes))
+    return params
+
 
 
 def parse_endpoint_page(url):
@@ -84,12 +181,10 @@ def parse_endpoint_page(url):
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         logging.error(f"HTTP error occurred: {err}")
-        to_fix.append(url)
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None
     except Exception as err:
         logging.error(f"Other error occurred: {err}")
-        to_fix.append(url)
-        return None, None, None, None, None, None
+        return None, None, None, None, None, None, None, None
 
     soup = BeautifulSoup(response.text, 'html.parser')
 
@@ -108,16 +203,29 @@ def parse_endpoint_page(url):
         param_name = clean_text(param.find('strong').text)
         param_type = clean_text(param.find(class_='type').text.split(': ')[1])
         param_desc = clean_text(param.find(class_='description').text) if param.find(class_='description') else ''
-        params.append((param_name, param_type, param_desc))
+        param_attributes_spans = param.find(class_='attributes').find_all('span') if param.find(
+            class_='attributes') else []
+        param_attributes = [clean_text(span.text) for span in param_attributes_spans]
+        params.append((param_name, param_type, param_desc, param_attributes))
 
     # Extract description
     description = soup.find(class_='description').text.strip()
 
     # Extract response
-    response_keys = parse_response_properties(soup)
+    response = parse_response_properties(soup)
+
+    # Extract verb
+    verb = soup.find(lambda tag: tag.name == "div" and "Verb:" in tag.text)
+    if verb:
+        verb = verb.text.split('Verb:')[1].split('\n')[0].strip()
+    # Body (optional)
+    if verb == "POST":
+        request_body = parse_request_body(soup)
+    else:
+        request_body = None
 
     logging.info(f"Completed parsing endpoint page: {url}")
-    return category.strip(), method_name.strip(), endpoint_url, params, description, response_keys
+    return category.strip(), method_name.strip(), endpoint_url, params, description, response,  verb, request_body
 
 
 def parse_all_endpoints():
@@ -158,12 +266,142 @@ def parse_all_endpoints():
     return categories
 
 
-if __name__ == '__main__':
-    all_endpoints = parse_all_endpoints()
-    for category, endpoints in all_endpoints.items():
-        print(category)
-        for endpoint in endpoints:
-            print(endpoint)
+def save_to_json(data, filename):
+    with open(filename, 'w') as file:
+        json.dump(data, file, indent=4)
 
-    print("To fix:")
-    print(to_fix)
+
+def load_from_json(filename):
+    with open(filename, 'r') as file:
+        return json.load(file)
+
+
+class EndpointsGenerator:
+    def __init__(self, endpoints):
+        self.endpoints = endpoints
+        self.base_url = "https://www.bungie.net/Platform"
+
+    @staticmethod
+    def format_code(path):
+        subprocess.run(['ruff', 'check', path, '--fix'])
+        subprocess.run(['ruff', 'format', path])
+
+    @staticmethod
+    def tuple_to_dict_string(tuple_list):
+        return ', '.join([f'"{t[0]}": {t[1]}' for t in tuple_list])
+
+    @staticmethod
+    def map_type_to_python(type_str):
+        type_mapping = {
+            "int16": "int",
+            "int32": "int",
+            "int64": "int",
+            "string": "str",
+            "date-time": "datetime",
+            "byte": "int",  # assuming byte is used as an integer value
+            "object": "dict",
+            "array": "list",
+            "boolean": "bool",
+            "uint32": "int",
+        }
+        return type_mapping.get(type_str, type_str)
+
+    def generate_method(self, endpoint):
+        category, method_name, url, params, description, response, verb, request_body_params = endpoint
+        param_str = ', '.join([f"{p[0]}: {self.map_type_to_python(p[1])}" for p in params])
+        request_body_param_str = ', '.join(
+            [f"{p[0]}: {self.map_type_to_python(p[1])}" for p in request_body_params]) if request_body_params else ''
+        request_body = f"""
+        request_body = {{
+            {', '.join([f'"{p[0]}": {p[0]}' for p in request_body_params])}
+        }}
+            """ if request_body_params else ''
+
+        # Parameters docstring
+        param_docs = "\n        ".join([f"{p[0]} ({self.map_type_to_python(p[1])}): {p[2]}" for p in params])
+
+        if method_name == 'GetMembershipDataById':
+            print("here")
+
+        # Response docstring
+        return_docs = json.dumps(response, indent=4)
+
+        method_docstring = f"\"\"\"{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \"\"\""
+
+        return f"""
+    async def {method_name}(self, {param_str} {',' if param_str else ''}{request_body_param_str}) -> dict:
+        {method_docstring}
+        {request_body}
+        try:
+            self.logger.info(f"Executing {method_name}...")
+            url = self.base_url + f"{url}".format({', '.join([f'{p[0]}={p[0]}' for p in params])})
+            return await self.requester.request(method=HTTPMethod.{verb}, url=url{", data=request_body" if request_body_params else ""})
+        except Exception as ex:
+            self.logger.exception(ex)
+        """
+
+    def generate_class(self, class_name: str = ""):
+        if class_name == "":
+            class_name = "Base"
+
+        # Access the list of endpoints for the given category
+        category_endpoints = self.endpoints.get(class_name, [])
+
+        methods = [self.generate_method(endpoint) for endpoint in category_endpoints]
+        class_def = f"""
+class {class_name}:
+    \"\"\"{class_name} endpoints.\"\"\"
+    def __init__(self, requester, logger):
+        self.requester: Requester = requester
+        self.logger = logger
+        self.base_url = "{self.base_url}"
+    {"".join(methods)}
+        """
+        return class_def
+
+    def generate_file(self, class_name: str = ""):
+        if class_name == "":
+            class_name = "Base"
+        if class_name == "Uncategorized":
+            return
+        imports = """
+from datetime import datetime
+from destipy_v2.utils.http_method import HTTPMethod
+from destipy_v2.utils.requester import Requester
+    """
+
+        with open(f"{TARGET_FOLDER}/{class_name.lower()}.py", "w") as file:
+            file.write(imports)
+            file.write(self.generate_class(class_name))
+
+        self.format_code(f"{TARGET_FOLDER}/{class_name.lower()}.py")
+
+
+def do_work(endpoints_data):
+    setup_destipy_folder()
+    #parse_enums()
+    generator = EndpointsGenerator(endpoints_data)
+    for category, _ in endpoints_data.items():
+        generator.generate_file(category)
+
+
+def setup_destipy_folder():
+    if os.path.exists(DESTIPY_FOLDER):
+        shutil.rmtree(DESTIPY_FOLDER)
+    shutil.copytree(TEMPLATE_FOLDER, DESTIPY_FOLDER)
+
+
+if __name__ == '__main__':
+    endpoints_file = f'{ROOT_FOLDER}/endpoints.json'
+    if os.path.exists(endpoints_file):
+        endpoints_data = load_from_json(endpoints_file)
+    else:
+        endpoints_data = parse_all_endpoints()
+        save_to_json(endpoints_data, endpoints_file)
+
+    do_work(endpoints_data)
+
+    #url = 'https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById'
+    #parse_endpoint_page(url)
+
+    # TODO: Fix response
