@@ -379,7 +379,7 @@ from destipy_v2.utils.requester import Requester
 
 def do_work(endpoints_data):
     setup_destipy_folder()
-    #parse_enums()
+    parse_enums()
     generator = EndpointsGenerator(endpoints_data)
     for category, _ in endpoints_data.items():
         generator.generate_file(category)
@@ -400,8 +400,3 @@ if __name__ == '__main__':
         save_to_json(endpoints_data, endpoints_file)
 
     do_work(endpoints_data)
-
-    #url = 'https://bungie-net.github.io/multi/operation_get_User-GetMembershipDataById.html#operation_get_User-GetMembershipDataById'
-    #parse_endpoint_page(url)
-
-    # TODO: Fix response
