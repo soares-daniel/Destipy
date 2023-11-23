@@ -174,10 +174,10 @@ def parse_request_body(soup):
 
 
 
-def parse_endpoint_page(url):
-    logging.info(f"Starting parsing endpoint page: {url}")
+def parse_endpoint_page(doc_url):
+    logging.info(f"Starting parsing endpoint page: {doc_url}")
     try:
-        response = session.get(url)
+        response = session.get(doc_url)
         response.raise_for_status()
     except requests.exceptions.HTTPError as err:
         logging.error(f"HTTP error occurred: {err}")
@@ -224,8 +224,8 @@ def parse_endpoint_page(url):
     else:
         request_body = None
 
-    logging.info(f"Completed parsing endpoint page: {url}")
-    return category.strip(), method_name.strip(), endpoint_url, params, description, response,  verb, request_body
+    logging.info(f"Completed parsing endpoint page: {doc_url}")
+    return category.strip(), method_name.strip(), endpoint_url, params, description, response,  verb, request_body, doc_url
 
 
 def parse_all_endpoints():
@@ -307,7 +307,7 @@ class EndpointsGenerator:
         return type_mapping.get(type_str, type_str)
 
     def generate_method(self, endpoint):
-        category, method_name, url, params, description, response, verb, request_body_params = endpoint
+        category, method_name, url, params, description, response, verb, request_body_params, doc_url = endpoint
         param_str = ', '.join([f"{p[0]}: {self.map_type_to_python(p[1])}" for p in params])
         request_body_param_str = ', '.join(
             [f"{p[0]}: {self.map_type_to_python(p[1])}" for p in request_body_params]) if request_body_params else ''
@@ -326,7 +326,7 @@ class EndpointsGenerator:
         # Response docstring
         return_docs = json.dumps(response, indent=4)
 
-        method_docstring = f"\"\"\"{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \"\"\""
+        method_docstring = f"\"\"\"{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \n\n.. seealso:: {doc_url}\"\"\""
 
         return f"""
     async def {method_name}(self, {param_str} {',' if param_str else ''}{request_body_param_str}) -> dict:
