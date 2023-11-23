@@ -9,20 +9,22 @@ import logging
 
 from parser.enum_parser import parse_enums
 
-BASE_URL = 'https://bungie-net.github.io/multi/'
+BASE_URL = "https://bungie-net.github.io/multi/"
 ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, 'destipy_v2')
-TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, 'template')
-TARGET_FOLDER = os.path.join(DESTIPY_FOLDER, 'endpoints')
-UTILS_FOLDER = os.path.join(DESTIPY_FOLDER, 'utils')
+DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, "destipy_v2")
+TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, "template")
+TARGET_FOLDER = os.path.join(DESTIPY_FOLDER, "endpoints")
+UTILS_FOLDER = os.path.join(DESTIPY_FOLDER, "utils")
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
 session = requests.Session()
 
 
 def clean_text(text):
-    return ' '.join(text.split())
+    return " ".join(text.split())
 
 
 @cache
@@ -37,24 +39,33 @@ def parse_array_contents(url):
         logging.error(f"Other error occurred: {err}")
         return []
 
-    soup = BeautifulSoup(response.text, 'html.parser')
-    selected = soup.select('.properties .property .box > .box-contents')
+    soup = BeautifulSoup(response.text, "html.parser")
+    selected = soup.select(".properties .property .box > .box-contents")
     schema_response = []
     for prop in selected:
-        if prop.find(class_='title'):
-            key = clean_text(prop.find(class_='title').find_all('strong')[0].text)
-            type_info = prop.find(class_='type-info')
-            if not type_info.find(class_='attributes'):
+        if prop.find(class_="title"):
+            key = clean_text(prop.find(class_="title").find_all("strong")[0].text)
+            type_info = prop.find(class_="type-info")
+            if not type_info.find(class_="attributes"):
                 # Nested type
-                href = type_info.find('a')['href']
+                href = type_info.find("a")["href"]
                 schema_prop = parse_schema_page(BASE_URL + href)
             else:
                 # Primitive type
                 schema_prop = {
-                    'Name': key,
-                    'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
-                    'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
-                    'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else []
+                    "Name": key,
+                    "Type": clean_text(
+                        type_info.find(class_="type").text.split(": ")[1]
+                    ),
+                    "Description": clean_text(type_info.find(class_="description").text)
+                    if type_info.find(class_="description")
+                    else "",
+                    "Attributes": [
+                        clean_text(span.text)
+                        for span in type_info.find(class_="attributes").find_all("span")
+                    ]
+                    if type_info.find(class_="attributes")
+                    else [],
                 }
             schema_response.append({key: schema_prop})
         else:
@@ -75,37 +86,65 @@ def parse_schema_page(url):
         logging.error(f"Other error occurred: {err}")
         return []
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, "html.parser")
 
     schema_response = {}
-    selected = soup.select('.properties .property .box > .box-contents')
+    selected = soup.select(".properties .property .box > .box-contents")
     for prop in selected:
-        if prop.find(class_='title'):
-            key = clean_text(prop.find(class_='title').find_all('strong')[0].text)
-            type_info = prop.find(class_='type-info')
-            if not type_info.find(class_='attributes'):
+        if prop.find(class_="title"):
+            key = clean_text(prop.find(class_="title").find_all("strong")[0].text)
+            type_info = prop.find(class_="type-info")
+            if not type_info.find(class_="attributes"):
                 # Nested type
-                href = type_info.find('a')['href']
+                href = type_info.find("a")["href"]
                 schema_prop = parse_schema_page(BASE_URL + href)
             else:
-                if type_info.find(class_='items'):
+                if type_info.find(class_="items"):
                     # Array type
-                    items = type_info.find(class_='items')
-                    href = items.find('a')['href'] if items.find('a') else None
+                    items = type_info.find(class_="items")
+                    href = items.find("a")["href"] if items.find("a") else None
                     schema_prop = {
-                        'Name': key,
-                        'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
-                        'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
-                        'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else [],
-                        'Array Contents': parse_array_contents(BASE_URL + href) if href else clean_text(items.text.split(':')[1].strip())
+                        "Name": key,
+                        "Type": clean_text(
+                            type_info.find(class_="type").text.split(": ")[1]
+                        ),
+                        "Description": clean_text(
+                            type_info.find(class_="description").text
+                        )
+                        if type_info.find(class_="description")
+                        else "",
+                        "Attributes": [
+                            clean_text(span.text)
+                            for span in type_info.find(class_="attributes").find_all(
+                                "span"
+                            )
+                        ]
+                        if type_info.find(class_="attributes")
+                        else [],
+                        "Array Contents": parse_array_contents(BASE_URL + href)
+                        if href
+                        else clean_text(items.text.split(":")[1].strip()),
                     }
                 else:
                     # Primitive type
                     schema_prop = {
-                        'Name': key,
-                        'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
-                        'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
-                        'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else []
+                        "Name": key,
+                        "Type": clean_text(
+                            type_info.find(class_="type").text.split(": ")[1]
+                        ),
+                        "Description": clean_text(
+                            type_info.find(class_="description").text
+                        )
+                        if type_info.find(class_="description")
+                        else "",
+                        "Attributes": [
+                            clean_text(span.text)
+                            for span in type_info.find(class_="attributes").find_all(
+                                "span"
+                            )
+                        ]
+                        if type_info.find(class_="attributes")
+                        else [],
                     }
             schema_response[key] = schema_prop
         else:
@@ -116,36 +155,43 @@ def parse_schema_page(url):
 
 def parse_response_properties(soup):
     response = {}
-    selected = soup.select('.response .property .box-contents')
+    selected = soup.select(".response .property .box-contents")
     for prop in selected:
-        key = clean_text(prop.find(class_='title').find_all('strong')[0].text)
-        type_info = prop.find(class_='type-info')
-        if type_info.find('a'):
+        key = clean_text(prop.find(class_="title").find_all("strong")[0].text)
+        type_info = prop.find(class_="type-info")
+        if type_info.find("a"):
             # Nested type
-            href = type_info.find('a')['href']
+            href = type_info.find("a")["href"]
             schema_props = parse_schema_page(BASE_URL + href)
             response[key] = schema_props
         else:
             # Primitive type
             value = {
-                'Name': key,
-                'Type': clean_text(type_info.find(class_='type').text.split(': ')[1]),
-                'Description': clean_text(type_info.find(class_='description').text) if type_info.find(class_='description') else '',
-                'Attributes': [clean_text(span.text) for span in type_info.find(class_='attributes').find_all('span')] if type_info.find(class_='attributes') else []
+                "Name": key,
+                "Type": clean_text(type_info.find(class_="type").text.split(": ")[1]),
+                "Description": clean_text(type_info.find(class_="description").text)
+                if type_info.find(class_="description")
+                else "",
+                "Attributes": [
+                    clean_text(span.text)
+                    for span in type_info.find(class_="attributes").find_all("span")
+                ]
+                if type_info.find(class_="attributes")
+                else [],
             }
             response[key] = value
     return response
 
 
 def parse_request_body(soup):
-    select = '.request-body .box-contents'
+    select = ".request-body .box-contents"
     selected = soup.select(select)
     params = []
     # Get link
     for prop in selected:
-        type_info = prop.find(class_='type-info')
-        if type_info and type_info.find('a'):
-            href = type_info.find('a')['href']
+        type_info = prop.find(class_="type-info")
+        if type_info and type_info.find("a"):
+            href = type_info.find("a")["href"]
             try:
                 response = session.get(BASE_URL + href)
                 response.raise_for_status()
@@ -156,22 +202,30 @@ def parse_request_body(soup):
                 logging.error(f"Other error occurred: {err}")
                 return []
 
-            soup2 = BeautifulSoup(response.text, 'html.parser')
-            select2 = '.properties .property .box > .box-contents'
+            soup2 = BeautifulSoup(response.text, "html.parser")
+            select2 = ".properties .property .box > .box-contents"
             selected2 = soup2.select(select2)
             for param in selected2:
-                if 'stop-nesting-boxes' in param.attrs.get('class', []):
+                if "stop-nesting-boxes" in param.attrs.get("class", []):
                     continue  # Enums
-                param_name = clean_text(param.find('strong').text)
-                param_type = clean_text(param.find(class_='type').text.split(': ')[1])
-                param_desc = clean_text(param.find(class_='description').text) if param.find(class_='description') else ''
-                param_attributes_spans = param.find(class_='attributes').find_all('span') if param.find(
-                    class_='attributes') else []
-                param_attributes = [clean_text(span.text) for span in param_attributes_spans]
+                param_name = clean_text(param.find("strong").text)
+                param_type = clean_text(param.find(class_="type").text.split(": ")[1])
+                param_desc = (
+                    clean_text(param.find(class_="description").text)
+                    if param.find(class_="description")
+                    else ""
+                )
+                param_attributes_spans = (
+                    param.find(class_="attributes").find_all("span")
+                    if param.find(class_="attributes")
+                    else []
+                )
+                param_attributes = [
+                    clean_text(span.text) for span in param_attributes_spans
+                ]
 
                 params.append((param_name, param_type, param_desc, param_attributes))
     return params
-
 
 
 def parse_endpoint_page(doc_url):
@@ -186,30 +240,37 @@ def parse_endpoint_page(doc_url):
         logging.error(f"Other error occurred: {err}")
         return None, None, None, None, None, None, None, None
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, "html.parser")
 
     # Extract category and method name
-    to_extract = soup.find('title').text.strip().split(' - ')[1]
-    category, method_name = to_extract.split('.')
+    to_extract = soup.find("title").text.strip().split(" - ")[1]
+    category, method_name = to_extract.split(".")
 
     # Extract endpoint URL
     endpoint_url = soup.find(lambda tag: tag.name == "div" and "Path:" in tag.text)
     if endpoint_url:
-        endpoint_url = endpoint_url.text.split('Path:')[1].split('\n')[0].strip()
+        endpoint_url = endpoint_url.text.split("Path:")[1].split("\n")[0].strip()
 
     # Extract parameters
     params = []
-    for param in soup.select('.parameters .box-contents ul li'):
-        param_name = clean_text(param.find('strong').text)
-        param_type = clean_text(param.find(class_='type').text.split(': ')[1])
-        param_desc = clean_text(param.find(class_='description').text) if param.find(class_='description') else ''
-        param_attributes_spans = param.find(class_='attributes').find_all('span') if param.find(
-            class_='attributes') else []
+    for param in soup.select(".parameters .box-contents ul li"):
+        param_name = clean_text(param.find("strong").text)
+        param_type = clean_text(param.find(class_="type").text.split(": ")[1])
+        param_desc = (
+            clean_text(param.find(class_="description").text)
+            if param.find(class_="description")
+            else ""
+        )
+        param_attributes_spans = (
+            param.find(class_="attributes").find_all("span")
+            if param.find(class_="attributes")
+            else []
+        )
         param_attributes = [clean_text(span.text) for span in param_attributes_spans]
         params.append((param_name, param_type, param_desc, param_attributes))
 
     # Extract description
-    description = soup.find(class_='description').text.strip()
+    description = soup.find(class_="description").text.strip()
 
     # Extract response
     response = parse_response_properties(soup)
@@ -217,7 +278,7 @@ def parse_endpoint_page(doc_url):
     # Extract verb
     verb = soup.find(lambda tag: tag.name == "div" and "Verb:" in tag.text)
     if verb:
-        verb = verb.text.split('Verb:')[1].split('\n')[0].strip()
+        verb = verb.text.split("Verb:")[1].split("\n")[0].strip()
     # Body (optional)
     if verb == "POST":
         request_body = parse_request_body(soup)
@@ -225,7 +286,17 @@ def parse_endpoint_page(doc_url):
         request_body = None
 
     logging.info(f"Completed parsing endpoint page: {doc_url}")
-    return category.strip(), method_name.strip(), endpoint_url, params, description, response,  verb, request_body, doc_url
+    return (
+        category.strip(),
+        method_name.strip(),
+        endpoint_url,
+        params,
+        description,
+        response,
+        verb,
+        request_body,
+        doc_url,
+    )
 
 
 def parse_all_endpoints():
@@ -240,20 +311,23 @@ def parse_all_endpoints():
         logging.error(f"Other error occurred: {err}")
         return {}
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, "html.parser")
     categories = {}
     processed_urls = set()
 
-    endpoints_section = soup.find('h2', string="Contents - Endpoints (Grouped by Tag)").find_next(
-        'div', class_='sidebar-box-contents')
+    endpoints_section = soup.find(
+        "h2", string="Contents - Endpoints (Grouped by Tag)"
+    ).find_next("div", class_="sidebar-box-contents")
 
-    for category_section in endpoints_section.select('ul > li'):
-        category_header = category_section.find('h3')
-        category_name = clean_text(category_header.text) if category_header else 'Uncategorized'
+    for category_section in endpoints_section.select("ul > li"):
+        category_header = category_section.find("h3")
+        category_name = (
+            clean_text(category_header.text) if category_header else "Uncategorized"
+        )
 
         endpoints = []
-        for endpoint in category_section.select('a'):
-            endpoint_url = BASE_URL + endpoint.get('href')
+        for endpoint in category_section.select("a"):
+            endpoint_url = BASE_URL + endpoint.get("href")
             if endpoint_url in processed_urls:
                 continue  # Skip already processed URLs
             processed_urls.add(endpoint_url)
@@ -267,12 +341,12 @@ def parse_all_endpoints():
 
 
 def save_to_json(data, filename):
-    with open(filename, 'w') as file:
+    with open(filename, "w") as file:
         json.dump(data, file, indent=4)
 
 
 def load_from_json(filename):
-    with open(filename, 'r') as file:
+    with open(filename, "r") as file:
         return json.load(file)
 
 
@@ -283,12 +357,12 @@ class EndpointsGenerator:
 
     @staticmethod
     def format_code(path):
-        subprocess.run(['ruff', 'check', path, '--fix'])
-        subprocess.run(['ruff', 'format', path])
+        subprocess.run(["ruff", "check", path, "--fix"])
+        subprocess.run(["ruff", "format", path])
 
     @staticmethod
     def tuple_to_dict_string(tuple_list):
-        return ', '.join([f'"{t[0]}": {t[1]}' for t in tuple_list])
+        return ", ".join([f'"{t[0]}": {t[1]}' for t in tuple_list])
 
     @staticmethod
     def map_type_to_python(type_str):
@@ -307,26 +381,52 @@ class EndpointsGenerator:
         return type_mapping.get(type_str, type_str)
 
     def generate_method(self, endpoint):
-        category, method_name, url, params, description, response, verb, request_body_params, doc_url = endpoint
-        param_str = ', '.join([f"{p[0]}: {self.map_type_to_python(p[1])}" for p in params])
-        request_body_param_str = ', '.join(
-            [f"{p[0]}: {self.map_type_to_python(p[1])}" for p in request_body_params]) if request_body_params else ''
-        request_body = f"""
+        (
+            category,
+            method_name,
+            url,
+            params,
+            description,
+            response,
+            verb,
+            request_body_params,
+            doc_url,
+        ) = endpoint
+        param_str = ", ".join(
+            [f"{p[0]}: {self.map_type_to_python(p[1])}" for p in params]
+        )
+        request_body_param_str = (
+            ", ".join(
+                [
+                    f"{p[0]}: {self.map_type_to_python(p[1])}"
+                    for p in request_body_params
+                ]
+            )
+            if request_body_params
+            else ""
+        )
+        request_body = (
+            f"""
         request_body = {{
             {', '.join([f'"{p[0]}": {p[0]}' for p in request_body_params])}
         }}
-            """ if request_body_params else ''
+            """
+            if request_body_params
+            else ""
+        )
 
         # Parameters docstring
-        param_docs = "\n        ".join([f"{p[0]} ({self.map_type_to_python(p[1])}): {p[2]}" for p in params])
+        param_docs = "\n        ".join(
+            [f"{p[0]} ({self.map_type_to_python(p[1])}): {p[2]}" for p in params]
+        )
 
-        if method_name == 'GetMembershipDataById':
+        if method_name == "GetMembershipDataById":
             print("here")
 
         # Response docstring
-        return_docs = json.dumps(response, indent=4)
+        return_docs = json.dumps(response["Response"], indent=4)
 
-        method_docstring = f"\"\"\"{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \n\n.. seealso:: {doc_url}\"\"\""
+        method_docstring = f'"""{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \n\n.. seealso:: {doc_url}"""'
 
         return f"""
     async def {method_name}(self, {param_str} {',' if param_str else ''}{request_body_param_str}) -> dict:
@@ -391,8 +491,8 @@ def setup_destipy_folder():
     shutil.copytree(TEMPLATE_FOLDER, DESTIPY_FOLDER)
 
 
-if __name__ == '__main__':
-    endpoints_file = f'{ROOT_FOLDER}/endpoints.json'
+if __name__ == "__main__":
+    endpoints_file = f"{ROOT_FOLDER}/endpoints.json"
     if os.path.exists(endpoints_file):
         endpoints_data = load_from_json(endpoints_file)
     else:
