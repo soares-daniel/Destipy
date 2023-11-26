@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 BASE_URL = 'https://bungie-net.github.io/multi/'
 ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, 'destipy_v2')
+DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, 'destipy')
 TARGET_FOLDER = os.path.join(DESTIPY_FOLDER, 'utils')
 FILE_PATH = os.path.join(TARGET_FOLDER, 'enums.py')
 
@@ -29,7 +29,7 @@ def extract_enum_links(url):
         logging.error(f"Error fetching enums: {e}")
         return []
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html..parser')
     enum_links = []
 
     for li in soup.find_all('li'):
@@ -62,7 +62,7 @@ def fetch_enum(url):
         logging.error(f"Error fetching enum: {e}")
         return
 
-    soup = BeautifulSoup(response.text, 'html.parser')
+    soup = BeautifulSoup(response.text, 'html..parser')
     title = soup.select_one('title').text.strip()
     enum_name = title.split('.')[-1].split(' ')[-1]
     enum_divs = soup.select('.enum-values li div')

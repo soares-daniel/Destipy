@@ -11,8 +11,8 @@ from parser.enum_parser import parse_enums
 
 BASE_URL = "https://bungie-net.github.io/multi/"
 ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, "destipy_v2")
-TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, "template")
+DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, "destipy")
+TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, ".template")
 TARGET_FOLDER = os.path.join(DESTIPY_FOLDER, "endpoints")
 UTILS_FOLDER = os.path.join(DESTIPY_FOLDER, "utils")
 
@@ -39,7 +39,7 @@ def parse_array_contents(url):
         logging.error(f"Other error occurred: {err}")
         return []
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html..parser")
     selected = soup.select(".properties .property .box > .box-contents")
     schema_response = []
     for prop in selected:
@@ -86,7 +86,7 @@ def parse_schema_page(url):
         logging.error(f"Other error occurred: {err}")
         return []
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html..parser")
 
     schema_response = {}
     selected = soup.select(".properties .property .box > .box-contents")
@@ -202,7 +202,7 @@ def parse_request_body(soup):
                 logging.error(f"Other error occurred: {err}")
                 return []
 
-            soup2 = BeautifulSoup(response.text, "html.parser")
+            soup2 = BeautifulSoup(response.text, "html..parser")
             select2 = ".properties .property .box > .box-contents"
             selected2 = soup2.select(select2)
             for param in selected2:
@@ -240,7 +240,7 @@ def parse_endpoint_page(doc_url):
         logging.error(f"Other error occurred: {err}")
         return None, None, None, None, None, None, None, None
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html..parser")
 
     # Extract category and method name
     to_extract = soup.find("title").text.strip().split(" - ")[1]
@@ -311,7 +311,7 @@ def parse_all_endpoints():
         logging.error(f"Other error occurred: {err}")
         return {}
 
-    soup = BeautifulSoup(response.text, "html.parser")
+    soup = BeautifulSoup(response.text, "html..parser")
     categories = {}
     processed_urls = set()
 
@@ -466,8 +466,8 @@ class {class_name}:
             return
         imports = """
 from datetime import datetime
-from destipy_v2.utils.http_method import HTTPMethod
-from destipy_v2.utils.requester import Requester
+from destipy.utils.http_method import HTTPMethod
+from destipy.utils.requester import Requester
     """
 
         with open(f"{TARGET_FOLDER}/{class_name.lower()}.py", "w") as file:
