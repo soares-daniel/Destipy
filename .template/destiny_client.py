@@ -3,12 +3,12 @@ import logging.handlers
 
 from .endpoints.app import App
 from .endpoints.base import Base
-from .endpoints.community_content import CommunityContent
+from .endpoints.communitycontent import CommunityContent
 from .endpoints.content import Content
 from .endpoints.destiny2 import Destiny2
 from .endpoints.fireteam import Fireteam
 from .endpoints.forum import Forum
-from .endpoints.group_v2 import GroupV2
+from .endpoints.groupv2 import GroupV2
 from .endpoints.social import Social
 from .endpoints.tokens import Tokens
 from .endpoints.trending import Trending
@@ -71,7 +71,7 @@ class DestinyClient():
         default_logger.addHandler(file_handler)
         self.logger = default_logger if logger is None else logger
         requester = Requester(api_key, max_ratelimit_retries, self.logger)
-        self.app: App = App(client_id, requester, self.logger)
+        self.app: App = App(requester, self.logger)
         self.base: Base = Base(requester, self.logger)
         self.community_content: CommunityContent = CommunityContent(requester, self.logger)
         self.content: Content = Content(requester, self.logger)
