@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 
-from parser.enum_parser import parse_enums
+from .enum_parser import parse_enums
 
 BASE_URL = "https://bungie-net.github.io/multi/"
 ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -272,6 +272,12 @@ def parse_endpoint_page(doc_url):
     # Extract description
     description = soup.find(class_="description").text.strip()
 
+    # Extract scope
+    scopes = []
+    for scope in soup.select(".required-scopes .box-contents ul li"):
+        scope_str = clean_text(scope.text)
+        scope.append(scope_str)
+
     # Extract response
     response = parse_response_properties(soup)
 
@@ -292,6 +298,7 @@ def parse_endpoint_page(doc_url):
         endpoint_url,
         params,
         description,
+        scopes,
         response,
         verb,
         request_body,
@@ -387,6 +394,7 @@ class EndpointsGenerator:
             url,
             params,
             description,
+            scopes,
             response,
             verb,
             request_body_params,
@@ -405,6 +413,7 @@ class EndpointsGenerator:
             if request_body_params
             else ""
         )
+
         request_body = (
             f"""
         request_body = {{
@@ -420,22 +429,19 @@ class EndpointsGenerator:
             [f"{p[0]} ({self.map_type_to_python(p[1])}): {p[2]}" for p in params]
         )
 
-        if method_name == "GetMembershipDataById":
-            print("here")
-
         # Response docstring
         return_docs = json.dumps(response["Response"], indent=4)
 
         method_docstring = f'"""{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \n\n.. seealso:: {doc_url}"""'
 
         return f"""
-    async def {method_name}(self, {param_str} {',' if param_str else ''}{request_body_param_str}) -> dict:
+    async def {method_name}(self, {param_str} {',' if param_str else ''}{request_body_param_str}{", access_token: str" if scopes else ""}) -> dict:
         {method_docstring}
         {request_body}
         try:
             self.logger.info(f"Executing {method_name}...")
             url = self.base_url + f"{url}".format({', '.join([f'{p[0]}={p[0]}' for p in params])})
-            return await self.requester.request(method=HTTPMethod.{verb}, url=url{", data=request_body" if request_body_params else ""})
+            return await self.requester.request(method=HTTPMethod.{verb}, url=url{", data=request_body" if request_body_params else ""}{", access_token=access_token" if scopes else ""})
         except Exception as ex:
             self.logger.exception(ex)
         """
