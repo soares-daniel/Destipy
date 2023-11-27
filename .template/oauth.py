@@ -17,8 +17,8 @@ class OAuth:
         self.requester: Requester = requester
         self.active_states = []
         self.redirect_url = redirect_url
-        self.TOKEN_URL = "https://www.bungie.net/platform/app/oauth/token/"
-        self.OAUTH_URL = "https://www.bungie.net/en/OAuth/"
+        self.TOKEN_URL = "https://www.bungie.net/Platform/App/OAuth/token/"
+        self.OAUTH_URL = "https://www.bungie.net/en/OAuth/Authorize"
 
     async def gen_auth_link(self) -> str:
         """Generates an authentication link for the user to use to authenticate with Bungie.net
@@ -29,7 +29,7 @@ class OAuth:
         self.logger.info("Generating auth link...")
         state = uuid.uuid4().hex
         self.active_states.append(state)
-        url = "{}authorize?client_id={}&response_type=code&state={}&redirect_uri={}".format(
+        url = "{}?client_id={}&response_type=code&state={}&redirect_uri={}".format(
             self.OAUTH_URL, self.client_id, state, self.redirect_url)
         return url
 
