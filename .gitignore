@@ -1,9 +1,15 @@
 #Env
+/venv
 /.venv
 /.vscode
+/.idea
+
 
 #PyPi
 dist
 Destipy.egg-info
-
 upload_dist.txt
+
+#General
+endpoints.json
+/destipy

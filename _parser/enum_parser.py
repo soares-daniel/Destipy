@@ -29,7 +29,7 @@ def extract_enum_links(url):
         logging.error(f"Error fetching enums: {e}")
         return []
 
-    soup = BeautifulSoup(response.text, 'html..parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
     enum_links = []
 
     for li in soup.find_all('li'):
@@ -62,7 +62,7 @@ def fetch_enum(url):
         logging.error(f"Error fetching enum: {e}")
         return
 
-    soup = BeautifulSoup(response.text, 'html..parser')
+    soup = BeautifulSoup(response.text, 'html.parser')
     title = soup.select_one('title').text.strip()
     enum_name = title.split('.')[-1].split(' ')[-1]
     enum_divs = soup.select('.enum-values li div')

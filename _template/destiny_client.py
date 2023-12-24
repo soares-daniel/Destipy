@@ -61,7 +61,7 @@ class DestinyClient():
         default_logger.setLevel(logging.DEBUG)
         formatter = logging.Formatter(fmt="%(asctime)s - %(levelname)-8s - %(name)s - %(message)s", datefmt="%H:%M:%S")
         file_handler = logging.handlers.TimedRotatingFileHandler(
-            filename= log_file,
+            filename=log_file,
             when="midnight",
             backupCount=7
         )

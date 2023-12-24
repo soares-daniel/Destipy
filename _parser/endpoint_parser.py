@@ -7,12 +7,12 @@ import requests
 from bs4 import BeautifulSoup
 import logging
 
-from .enum_parser import parse_enums
+from _parser.enum_parser import parse_enums
 
 BASE_URL = "https://bungie-net.github.io/multi/"
 ROOT_FOLDER = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DESTIPY_FOLDER = os.path.join(ROOT_FOLDER, "destipy")
-TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, ".template")
+TEMPLATE_FOLDER = os.path.join(ROOT_FOLDER, "_template")
 TARGET_FOLDER = os.path.join(DESTIPY_FOLDER, "endpoints")
 UTILS_FOLDER = os.path.join(DESTIPY_FOLDER, "utils")
 
@@ -39,7 +39,7 @@ def parse_array_contents(url):
         logging.error(f"Other error occurred: {err}")
         return []
 
-    soup = BeautifulSoup(response.text, "html..parser")
+    soup = BeautifulSoup(response.text, "html.parser")
     selected = soup.select(".properties .property .box > .box-contents")
     schema_response = []
     for prop in selected:
@@ -86,7 +86,7 @@ def parse_schema_page(url):
         logging.error(f"Other error occurred: {err}")
         return []
 
-    soup = BeautifulSoup(response.text, "html..parser")
+    soup = BeautifulSoup(response.text, "html.parser")
 
     schema_response = {}
     selected = soup.select(".properties .property .box > .box-contents")
@@ -202,7 +202,7 @@ def parse_request_body(soup):
                 logging.error(f"Other error occurred: {err}")
                 return []
 
-            soup2 = BeautifulSoup(response.text, "html..parser")
+            soup2 = BeautifulSoup(response.text, "html.parser")
             select2 = ".properties .property .box > .box-contents"
             selected2 = soup2.select(select2)
             for param in selected2:
@@ -240,8 +240,7 @@ def parse_endpoint_page(doc_url):
         logging.error(f"Other error occurred: {err}")
         return None, None, None, None, None, None, None, None
 
-    soup = BeautifulSoup(response.text, "html..parser")
-
+    soup = BeautifulSoup(response.text, "html.parser")
     # Extract category and method name
     to_extract = soup.find("title").text.strip().split(" - ")[1]
     category, method_name = to_extract.split(".")
@@ -272,11 +271,17 @@ def parse_endpoint_page(doc_url):
     # Extract description
     description = soup.find(class_="description").text.strip()
 
+    if method_name == "GetMembershipDataForCurrentUser":
+        print("here")
+
     # Extract scope
     scopes = []
     for scope in soup.select(".required-scopes .box-contents ul li"):
         scope_str = clean_text(scope.text)
-        scope.append(scope_str)
+        scopes.append(scope_str)
+
+    if method_name in ["GetVendor", "GetVendors"]:
+        scopes.append("oauth2: ReadBasicUserProfile")
 
     # Extract response
     response = parse_response_properties(soup)
@@ -318,7 +323,7 @@ def parse_all_endpoints():
         logging.error(f"Other error occurred: {err}")
         return {}
 
-    soup = BeautifulSoup(response.text, "html..parser")
+    soup = BeautifulSoup(response.text, "html.parser")
     categories = {}
     processed_urls = set()
 
@@ -429,13 +434,17 @@ class EndpointsGenerator:
             [f"{p[0]} ({self.map_type_to_python(p[1])}): {p[2]}" for p in params]
         )
 
+        if method_name == "GetMembershipDataForCurrentUser":
+            print("here")
+
         # Response docstring
         return_docs = json.dumps(response["Response"], indent=4)
 
-        method_docstring = f'"""{description}\n\n    Args:\n        {param_docs}\n\n    Returns:\n{return_docs}\n        \n\n.. seealso:: {doc_url}"""'
+        args_space = "\n        "
+        method_docstring = f'"""{description}\n\n    Args:{args_space + param_docs if param_docs else ""}{args_space + "access_token (str): OAuth token" if scopes else ""}\n\n    Returns:\n{return_docs}\n        \n\n.. seealso:: {doc_url}"""'
 
         return f"""
-    async def {method_name}(self, {param_str} {',' if param_str else ''}{request_body_param_str}{", access_token: str" if scopes else ""}) -> dict:
+    async def {method_name}(self{", " + param_str if params else ""}{", " + request_body_param_str if request_body else ""}{", access_token: str" if scopes else ""}) -> dict:
         {method_docstring}
         {request_body}
         try:
