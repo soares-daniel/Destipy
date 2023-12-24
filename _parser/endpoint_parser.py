@@ -449,7 +449,7 @@ class EndpointsGenerator:
         {request_body}
         try:
             self.logger.info(f"Executing {method_name}...")
-            url = self.base_url + f"{url}".format({', '.join([f'{p[0]}={p[0]}' for p in params])})
+            url = self.base_url + f"{url}"
             return await self.requester.request(method=HTTPMethod.{verb}, url=url{", data=request_body" if request_body_params else ""}{", access_token=access_token" if scopes else ""})
         except Exception as ex:
             self.logger.exception(ex)
