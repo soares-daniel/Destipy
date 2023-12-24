@@ -4,12 +4,8 @@ This is a asynchronous Python Wrapper around the Bungie API. It allows one to se
 
 NOTE:
 
-* This is my first real project which was meant for a Discord Bot for my own Server but then decided to release, which means that bugs are likely.
+* The endpoints are parsed from the API documentation and are therefore not tested, some of them might not work or are missing parameters due to inconsistencies in the documentation.
 * Some of the code is inspired or taken from [pydest](https://github.com/jgayfer/pydest/tree/master/pydest) and [aiobungie](https://github.com/nxtlo/aiobungie) so check them out!
-
-ISSUES:
-
-* Some of the Endpoints POST endpoints may not work properly. I just reworked the request-design but need to implement tests to verify that everything works!
 
 ## Features
 
@@ -57,4 +53,4 @@ user = await user_endpoints.GetBungieNetUserById(<MEMBERSHIP_ID>)
 
 ## Contact
 
-Discord: `Sedamaso#5217`
+Discord: `sedam79`
